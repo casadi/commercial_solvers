@@ -10,10 +10,10 @@ runs:
   steps:
     
     # Download protected release asset
-    - uses: dsaltares/fetch-gh-release-asset@master
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
         repo: 'jgillis/restricted'
-        version: 'perpetual'
+        version: 'Perpetual'
         file: 'knitro-13.2.0-Linux-64.tar.gz'
         token: ${{ inputs.token }}
     - run: tar -xzf knitro-13.2.0-Linux-64.tar.gz
