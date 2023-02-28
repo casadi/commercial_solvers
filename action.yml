@@ -15,10 +15,16 @@ runs:
         repo: 'jgillis/restricted'
         file: 'knitro-13.2.0-Linux-64.tar.gz'
         token: ${{ inputs.token }}
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: 'jgillis/restricted'
+        file: 'artelys_lic_5007_casadi-dev_2022-08-24.txt'
+        token: ${{ inputs.token }}
     - run: tar -xzf knitro-13.2.0-Linux-64.tar.gz
       shell: bash
     # Add to PATH
     - run: echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/knitro-13.2.0-Linux-64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
       shell: bash
-
+    - run: echo "ARTELYS_LICENSE=$GITHUB_WORKSPACE/artelys_lic_5007_casadi-dev_2022-08-24.txt" >> $GITHUB_ENV
+      shell: bash
       
