@@ -1,14 +1,23 @@
 name: commercial_solvers
 description: Set up commercial solvers in CI for testing purposes
+inputs:
+  token:
+    description: GitHub token with access to the private repo
+    required: true
 
 runs:
   using: "composite"
   steps:
+    
     # Download protected release asset
     - uses: dsaltares/fetch-gh-release-asset@master
       with:
         repo: 'jgillis/restricted'
         version: 'perpetual'
         file: 'knitro-13.2.0-Linux-64.tar.gz'
-        token: ${{ secrets.JGILLIS_RESTRICTED }}
+        token: ${{ inputs.token }}
+    - run: tar -xzf knitro-13.2.0-Linux-64.tar.gz
+    # Add to PATH
+    - run: echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/knitro-13.2.0-Linux-64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
       
