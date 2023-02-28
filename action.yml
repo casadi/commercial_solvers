@@ -17,7 +17,9 @@ runs:
         file: 'knitro-13.2.0-Linux-64.tar.gz'
         token: ${{ inputs.token }}
     - run: tar -xzf knitro-13.2.0-Linux-64.tar.gz
+      shell: bash
     # Add to PATH
     - run: echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/knitro-13.2.0-Linux-64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      shell: bash
 
       
