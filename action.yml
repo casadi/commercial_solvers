@@ -25,6 +25,8 @@ runs:
     # Add to PATH
     - run: echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/knitro-13.2.0-Linux-64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
       shell: bash
+    - run: echo "LD_PRELOAD=$GITHUB_WORKSPACE/knitro-13.2.0-Linux-64/lib/libiomp5.so" >> $GITHUB_ENV
+      shell: bash
     - run: echo "ARTELYS_LICENSE=$GITHUB_WORKSPACE/artelys_lic_5007_casadi-dev_2022-08-24.txt" >> $GITHUB_ENV
       shell: bash
       
