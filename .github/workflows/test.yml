@@ -10,4 +10,4 @@ jobs:
     - uses: actions/checkout@v3.3.0
     - uses: ./
       with:
-        - token: ${{ secrets.JGILLIS_RESTRICTED }}
+        token: ${{ secrets.JGILLIS_RESTRICTED }}
