@@ -34,24 +34,25 @@ runs:
         token: ${{ inputs.token }}
     - run: tar -xzf ${{env.knitro}}.tar.gz -C $RUNNER_TEMP
       shell: bash
-      if: "$RUNNER_OS != 'Windows'"
+      if: runner.os != 'Windows'
     - run: unzip ${{env.knitro}}.zip -d $RUNNER_TEMP
       shell: bash
-      if: "$RUNNER_OS == 'Windows'"
+      if: runner.os == 'Windows'
     - run: cp artelys_lic_5007_casadi-dev_2022-08-24.txt $RUNNER_TEMP
       shell: bash
       
     # Add to PATH
     - run: echo "LD_LIBRARY_PATH=$RUNNER_TEMP/${{env.knitro}}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-      if: "$RUNNER_OS != 'Windows'"
+      if: runner.os != 'Windows'
       shell: bash
     - run: echo "$PATH"
       shell: bash
+      
     - run: echo "PATH=$RUNNER_TEMP/${{env.knitro}}/lib;$PATH" >> $GITHUB_ENV
-      if: "$RUNNER_OS == 'Windows'"
+      if: runner.os == 'Windows'
       shell: bash
     - run: echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so" >> $GITHUB_ENV
-      if: "$RUNNER_OS != 'Windows'"
+      if: runner.os != 'Windows'
       shell: bash
     - run: echo "ARTELYS_LICENSE=$RUNNER_TEMP/artelys_lic_5007_casadi-dev_2022-08-24.txt" >> $GITHUB_ENV
       shell: bash
