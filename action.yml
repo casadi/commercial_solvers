@@ -8,10 +8,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: pwd
-      shell: bash
-    - run: echo "$RUNNER_TEMP"
-      shell: bash
     # Download protected release asset
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
@@ -25,9 +21,7 @@ runs:
         token: ${{ inputs.token }}
     - run: tar -xzf knitro-13.2.0-Linux-64.tar.gz -C $RUNNER_TEMP
       shell: bash
-    - run: ls $RUNNER_TEMP
-      shell: bash
-    - run: pwd
+    - run: cp artelys_lic_5007_casadi-dev_2022-08-24.txt $RUNNER_TEMP
       shell: bash
       
     # Add to PATH
