@@ -9,7 +9,9 @@ runs:
   using: "composite"
   steps:
     - run: pwd
+      shell: bash
     - run: echo "$GITHUB_WORKSPACE"
+      shell: bash
     # Download protected release asset
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
@@ -24,7 +26,9 @@ runs:
     - run: tar -xzf knitro-13.2.0-Linux-64.tar.gz
       shell: bash
     - run: ls
+      shell: bash
     - run: pwd
+      shell: bash
     # Add to PATH
     - run: echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/knitro-13.2.0-Linux-64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
       shell: bash
