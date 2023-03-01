@@ -12,7 +12,7 @@ runs:
       shell: bash
     - uses: kanga333/variable-mapper@v0.3.0
       with:
-        key: "$RUNNER_OS-$RUNNER_ARCH"
+        key: "${{runner.os}}-${{runner.arch}}"
         map: |
          {
             "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64"},
