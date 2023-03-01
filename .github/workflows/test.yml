@@ -11,3 +11,7 @@ jobs:
     - uses: ./
       with:
         token: ${{ secrets.JGILLIS_RESTRICTED }}
+    - run: echo "$LD_LIBRARY_PATH"
+    - run: pwd
+    - run: ls
+    - run: /home/runner/work/casadi/commercial_solvers/knitro-13.2.0-Linux-64/lib/libiomp5.so
