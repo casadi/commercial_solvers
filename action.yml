@@ -25,10 +25,11 @@ runs:
         token: ${{ inputs.token }}
     - run: tar -xzf knitro-13.2.0-Linux-64.tar.gz
       shell: bash
-    - run: ls && ls knitro-13.2.0-Linux-64 && ls knitro-13.2.0-Linux-64/lib
+    - run: ls && ls knitro-13.2.0-Linux-64 && ls knitro-13.2.0-Linux-64/lib && ls /home/runner/work/casadi/casadi/knitro-13.2.0-Linux-64/lib/libiomp5.so
       shell: bash
     - run: pwd
       shell: bash
+      
     # Add to PATH
     - run: echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/knitro-13.2.0-Linux-64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
       shell: bash
