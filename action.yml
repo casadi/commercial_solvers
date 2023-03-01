@@ -25,7 +25,7 @@ runs:
         token: ${{ inputs.token }}
     - run: tar -xzf knitro-13.2.0-Linux-64.tar.gz
       shell: bash
-    - run: ls
+    - run: ls && ls knitro-13.2.0-Linux-64 && ls knitro-13.2.0-Linux-64/lib
       shell: bash
     - run: pwd
       shell: bash
