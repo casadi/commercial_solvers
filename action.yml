@@ -69,16 +69,17 @@ runs:
       
     - run: echo "CPLEX_VERSION=2211" >> $GITHUB_ENV
       shell: bash
-    - run: echo <<EOF > github_actions.properties
-      INSTALLER_UI=silent
-      LICENSE_ACCEPTED=TRUE
-      USER_INSTALL_DIR=$RUNNER_TEMP/CPLEX
-      INSTALLER_LOCALE=en
-      CPLEX_STUDIO_FILE_ASSOCIATION=0
-      CPLEX_STUDIO_PATH_UPDATE=0
-      CPLEX_STUDIO_README=0
-      CPLEX_STUDIO_IDE=0
-      EOF
+    - run: |
+          echo <<EOF > github_actions.properties
+          INSTALLER_UI=silent
+          LICENSE_ACCEPTED=TRUE
+          USER_INSTALL_DIR=$RUNNER_TEMP/CPLEX
+          INSTALLER_LOCALE=en
+          CPLEX_STUDIO_FILE_ASSOCIATION=0
+          CPLEX_STUDIO_PATH_UPDATE=0
+          CPLEX_STUDIO_README=0
+          CPLEX_STUDIO_IDE=0
+          EOF
       shell: bash
     - run: chmod +x ${{env.cplex}}
       if: runner.os == 'Linux'
