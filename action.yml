@@ -93,7 +93,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
     - run: ${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
-      shell: bash
+      shell: cmd
       if: runner.os == 'Windows'
     # Add to PATH
     - run: |
