@@ -90,7 +90,8 @@ runs:
     - run: |
           # Escape backslash in property file
           sed -i 's/\\/\//g' github_actions.properties
-          echo "${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties" > install_cplex.bat
+          echo "${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties -console" > install_cplex.bat
+          cat install_cplex.bat
       if: runner.os == 'Windows'
       shell: bash
     - run: cat github_actions.properties
@@ -102,7 +103,7 @@ runs:
       shell: bash
 
     - run: install_cplex.bat
-      shell: cmd
+      shell: pwsh
       if: runner.os == 'Windows'
     # Add to PATH
     - run: |
@@ -114,12 +115,18 @@ runs:
 
     - run: |
             unzip ${{env.cplex}}.zip -d $RUNNER_TEMP
-            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx -f github_actions.properties
+            pwd
+            ls
+            echo ${{ github.workspace }}
+            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx -f ${{ github.workspace }}/github_actions.properties
       shell: bash
       if: runner.os == 'macOS' && runner.arch == 'X64'
     - run: |
             unzip ${{env.cplex}}.zip -d $RUNNER_TEMP
-            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx-arm64.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx-arm64 -f github_actions.properties
+            pwd
+            ls
+            echo ${{ github.workspace }}
+            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx-arm64.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx-arm64 -f ${{ github.workspace }}/github_actions.properties
       shell: bash
       if: runner.os == 'macOS' && runner.arch == 'ARM64'
       
