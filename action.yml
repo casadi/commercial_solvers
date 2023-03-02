@@ -47,6 +47,13 @@ runs:
         echo "DYLD_LIBRARY_PATH=$RUNNER_TEMP/${{env.knitro}}/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
       if: runner.os != 'Windows'
       shell: bash
+      
+    # cfr. https://github.com/pypa/cibuildwheel/issues/816
+    - run: |
+        sudo cp $RUNNER_TEMP/${{env.knitro}}/lib/* /usr/local/lib
+      if: runner.os == 'macOS'
+      shell: bash
+      
     - run: ls $RUNNER_TEMP/${{env.knitro}} && ls $RUNNER_TEMP/${{env.knitro}}/lib
       shell: bash
     - run: echo "$PATH"
