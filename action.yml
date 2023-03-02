@@ -15,8 +15,8 @@ runs:
         key: "${{runner.os}}-${{runner.arch}}"
         map: |
          {
-            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz"},
-            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip"},
+            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64.bin"},
+            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SVML-win-x86-64.exe"},
             "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz"},
             "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz"}
          }
@@ -67,3 +67,26 @@ runs:
     - run: echo "ARTELYS_LICENSE=$RUNNER_TEMP/artelys_lic_5007_casadi-dev_2022-08-24.txt" >> $GITHUB_ENV
       shell: bash
       
+      
+    - run: echo <<EOF > github_actions.properties
+      INSTALLER_UI=silent
+      LICENSE_ACCEPTED=TRUE
+      USER_INSTALL_DIR=$RUNNER_TEMP/CPLEX
+      INSTALLER_LOCALE=en
+      CPLEX_STUDIO_FILE_ASSOCIATION=0
+      CPLEX_STUDIO_PATH_UPDATE=0
+      CPLEX_STUDIO_README=0
+      CPLEX_STUDIO_IDE=0
+      EOF
+      shell: bash
+    - run: chmod +x ${{env.cplex}}
+      if: runner.os == 'Linux'
+      shell: bash
+    - run: ${{env.cplex}} -f github_actions.properties
+    # Add to PATH
+    - run: |
+        ls $RUNNER_TEMP/CPLEX
+        ls $RUNNER_TEMP/CPLEX/cplex/bin/x86-64_linux
+        echo "LD_LIBRARY_PATH=$RUNNER_TEMP/CPLEX/cplex/bin/x86-64_linux:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      if: runner.os == 'Linux'
+      shell: bash
