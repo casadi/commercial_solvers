@@ -76,7 +76,7 @@ runs:
     - run: echo "CPLEX_VERSION=2211" >> $GITHUB_ENV
       shell: bash
     - run: |
-          echo <<EOF > github_actions.properties
+          cat <<EOF > github_actions.properties
           INSTALLER_UI=silent
           LICENSE_ACCEPTED=TRUE
           USER_INSTALL_DIR=$RUNNER_TEMP/CPLEX
