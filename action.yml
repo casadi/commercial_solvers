@@ -15,10 +15,10 @@ runs:
         key: "${{runner.os}}-${{runner.arch}}"
         map: |
          {
-            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64.bin"},
-            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SVML-win-x86-64.exe"},
-            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx.zip"},
-            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64.zip"}
+            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin"},
+            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SVML-win-x86-64", "cplex_suffix": ".exe"},
+            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx", "cplex_suffix": ".zip"},
+            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64", "cplex_suffix": ".zip"}
          }
         export_to: env
     # Download protected release asset
@@ -71,7 +71,7 @@ runs:
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
         repo: 'jgillis/restricted'
-        file: ${{env.cplex}}
+        file: ${{env.cplex}}${{env.cplex_suffix}}
         token: ${{ inputs.token }}
     - run: echo "CPLEX_VERSION=2211" >> $GITHUB_ENV
       shell: bash
@@ -87,13 +87,12 @@ runs:
           CPLEX_STUDIO_IDE=0
           EOF
       shell: bash
-    - run: chmod +x ${{env.cplex}}
+    - run: |
+        chmod +x ${{env.cplex}}${{env.cplex_suffix}}
+        ./${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
       if: runner.os == 'Linux'
       shell: bash
-    - run: ./${{env.cplex}} -f github_actions.properties
-      shell: bash
-      if: runner.os == 'Linux'
-    - run: ${{env.cplex}} -f github_actions.properties
+    - run: ${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
       shell: bash
       if: runner.os == 'Windows'
     # Add to PATH
