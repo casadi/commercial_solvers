@@ -17,8 +17,8 @@ runs:
          {
             "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64.bin"},
             "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SVML-win-x86-64.exe"},
-            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz"},
-            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz"}
+            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx.zip"},
+            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64.zip"}
          }
         export_to: env
     # Download protected release asset
@@ -67,7 +67,8 @@ runs:
     - run: echo "ARTELYS_LICENSE=$RUNNER_TEMP/artelys_lic_5007_casadi-dev_2022-08-24.txt" >> $GITHUB_ENV
       shell: bash
       
-      
+    - run: echo "CPLEX_VERSION=2211" >> $GITHUB_ENV
+      shell: bash
     - run: echo <<EOF > github_actions.properties
       INSTALLER_UI=silent
       LICENSE_ACCEPTED=TRUE
@@ -83,10 +84,27 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
     - run: ${{env.cplex}} -f github_actions.properties
+      shell: bash
+      if: runner.os != 'macOS'
     # Add to PATH
     - run: |
         ls $RUNNER_TEMP/CPLEX
         ls $RUNNER_TEMP/CPLEX/cplex/bin/x86-64_linux
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/CPLEX/cplex/bin/x86-64_linux:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      if: runner.os == 'Linux'
+      shell: bash
+
+    - run: |
+            unzip ${{env.cplex}}.zip -d $RUNNER_TEMP
+            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx -f ./installer.properties:
+      shell: bash
+      if: runner.os == 'macOS' && runner.arch == 'X64'
+    - run: |
+            unzip ${{env.cplex}}.zip -d $RUNNER_TEMP
+            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx-arm64.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx-arm64 -f ./installer.properties:
+      shell: bash
+      if: runner.os == 'macOS' && runner.arch == 'ARM64'
+      
+    - run: ls $RUNNER_TEMP/CPLEX
       if: runner.os == 'Linux'
       shell: bash
