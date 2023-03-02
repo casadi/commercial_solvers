@@ -92,7 +92,7 @@ runs:
       shell: bash
     - run: ./${{env.cplex}} -f github_actions.properties
       shell: bash
-      if: runner.os != 'Linux'
+      if: runner.os == 'Linux'
     - run: ${{env.cplex}} -f github_actions.properties
       shell: bash
       if: runner.os == 'Windows'
