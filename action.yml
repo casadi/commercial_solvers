@@ -87,12 +87,14 @@ runs:
           CPLEX_STUDIO_IDE=0
           EOF
       shell: bash
+    - run: cat github_actions.properties
+      shell: bash
     - run: |
         chmod +x ${{env.cplex}}${{env.cplex_suffix}}
-        ./${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
+        ./${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties -silent
       if: runner.os == 'Linux'
       shell: bash
-    - run: ${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
+    - run: ${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties -silent
       shell: cmd
       if: runner.os == 'Windows'
     # Add to PATH
@@ -104,16 +106,18 @@ runs:
       shell: bash
 
     - run: |
-            unzip ${{env.cplex}}.zip -d $RUNNER_TEMP
-            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx -f github_actions.properties
+            unzip ${{env.cplex}}.zip -q -d $RUNNER_TEMP
+            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx -f github_actions.properties -silent
       shell: bash
       if: runner.os == 'macOS' && runner.arch == 'X64'
     - run: |
-            unzip ${{env.cplex}}.zip -d $RUNNER_TEMP
-            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx-arm64.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx-arm64 -f github_actions.properties
+            unzip ${{env.cplex}}.zip -q -d $RUNNER_TEMP
+            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx-arm64.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx-arm64 -f github_actions.properties -silent
       shell: bash
       if: runner.os == 'macOS' && runner.arch == 'ARM64'
       
     - run: ls $RUNNER_TEMP/CPLEX
-      if: runner.os == 'Linux'
       shell: bash
+    - run: find $RUNNER_TEMP/CPLEX -name "*.dylib"
+      shell: bash
+      if: runner.os != 'Windows'
