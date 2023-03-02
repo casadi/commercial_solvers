@@ -44,8 +44,7 @@ runs:
     # Add to PATH
     - run: |
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/${{env.knitro}}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "DYLD_LIBRARY_PATH=$RUNNER_TEMP/${{env.knitro}}/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
-      if: runner.os != 'Windows'
+      if: runner.os == 'Linux'
       shell: bash
       
     # cfr. https://github.com/pypa/cibuildwheel/issues/816
