@@ -91,10 +91,10 @@ runs:
       shell: bash
     - run: |
         chmod +x ${{env.cplex}}${{env.cplex_suffix}}
-        ./${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties -silent
+        ./${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
       if: runner.os == 'Linux'
       shell: bash
-    - run: ${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties -silent
+    - run: ${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
       shell: cmd
       if: runner.os == 'Windows'
     # Add to PATH
@@ -107,12 +107,12 @@ runs:
 
     - run: |
             unzip ${{env.cplex}}.zip -q -d $RUNNER_TEMP
-            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx -f github_actions.properties -silent
+            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx -f github_actions.properties
       shell: bash
       if: runner.os == 'macOS' && runner.arch == 'X64'
     - run: |
             unzip ${{env.cplex}}.zip -q -d $RUNNER_TEMP
-            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx-arm64.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx-arm64 -f github_actions.properties -silent
+            $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx-arm64.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx-arm64 -f github_actions.properties
       shell: bash
       if: runner.os == 'macOS' && runner.arch == 'ARM64'
       
