@@ -90,6 +90,8 @@ runs:
     - run: |
           # Escape backslash in property file
           sed -i 's/\\/\\\\/g' github_actions.properties
+          echo "${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties" > install_cplex.bat
+      if: runner.os == 'Windows'
       shell: bash
     - run: cat github_actions.properties
       shell: bash
@@ -99,9 +101,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
 
-    - run: |
-          echo "${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties" > install_cplex.bat
-          install_cplex.bat
+    - run: install_cplex.bat
       shell: cmd
       if: runner.os == 'Windows'
     # Add to PATH
