@@ -47,6 +47,8 @@ runs:
         echo "DYLD_LIBRARY_PATH=$RUNNER_TEMP/${{env.knitro}}/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
       if: runner.os != 'Windows'
       shell: bash
+    - run: ls $RUNNER_TEMP/${{env.knitro}} && ls $RUNNER_TEMP/${{env.knitro}}/lib
+      shell: bash
     - run: echo "$PATH"
       shell: bash
       
