@@ -102,7 +102,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
 
-    - run: install_cplex.bat
+    - run: Invoke-Expression -Command ".\install_cplex.bat"
       shell: pwsh
       if: runner.os == 'Windows'
     # Add to PATH
@@ -119,6 +119,8 @@ runs:
             ls
             echo ${{ github.workspace }}
             $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx -f ${{ github.workspace }}/github_actions.properties
+            ls $RUNNER_TEMP/CPLEX/cplex/bin/x86-64_osx/*
+            sudo cp $RUNNER_TEMP/CPLEX/cplex/bin/x86-64_osx/* /usr/local/lib
       shell: bash
       if: runner.os == 'macOS' && runner.arch == 'X64'
     - run: |
@@ -127,14 +129,17 @@ runs:
             ls
             echo ${{ github.workspace }}
             $RUNNER_TEMP/cplex_studio${CPLEX_VERSION}-osx-arm64.app/contents/MacOS/cplex_studio${CPLEX_VERSION}-osx-arm64 -f ${{ github.workspace }}/github_actions.properties
+            ls $RUNNER_TEMP/CPLEX/cplex/bin/arm64_osx/*
+            sudo cp $RUNNER_TEMP/CPLEX/cplex/bin/arm64_osx/* /usr/local/lib
       shell: bash
       if: runner.os == 'macOS' && runner.arch == 'ARM64'
       
     - run: ls $RUNNER_TEMP/CPLEX
       shell: bash
-    - run: find $RUNNER_TEMP/CPLEX -name "*.dylib"
+    - run: |
+            cp CPLEX/cplex/bin/x86-64_osx/libcplex2211.dylib find $RUNNER_TEMP/CPLEX -name "*.dylib"
       shell: bash
-      if: runner.os != 'Windows'
+      if: runner.os == 'Windows'
 
     # Gurobi
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
@@ -147,7 +152,7 @@ runs:
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/gurobi1001/linux64/lib/:$LD_LIBRARY_PATH" >> $GITHUB_ENV
         echo "GUROBI_VERSION=100" >> $GITHUB_ENV
         ls $RUNNER_TEMP
-        ls $RUNNER_TEMP/gurobi1001/gurobi1001/linux64/lib
+        ls $RUNNER_TEMP/gurobi1001/linux64/lib
       shell: bash
       if: runner.os == 'Linux'
     - run: |
