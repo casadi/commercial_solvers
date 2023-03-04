@@ -169,10 +169,10 @@ runs:
       if: runner.os == 'Windows'
     - run: ls c:\gurobi1001\win64
       shell: bash
-      if: runner.os == 'Windows
+      if: runner.os == 'Windows'
     - run: ls c:\gurobi1001\win64\bin
       shell: bash
-      if: runner.os == 'Windows
+      if: runner.os == 'Windows'
     - run: echo "PATh=c:\gurobi1001\win64;$PATH" >> $GITHUB_ENV
       if: runner.os == 'Windows'
       shell: bash
