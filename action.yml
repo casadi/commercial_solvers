@@ -102,6 +102,9 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
 
+    - name: Setup headless display
+      uses: pyvista/setup-headless-display-action@v1
+      
     - run: ${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
       shell: Cmd
       if: runner.os == 'Windows'
