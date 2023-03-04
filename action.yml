@@ -150,6 +150,9 @@ runs:
         file: ${{env.gurobi}}
         token: ${{ inputs.token }}
     - run: |
+        echo "GUROBI_VERSION=100" >> $GITHUB_ENV
+      shell: bash
+    - run: |
         tar -xzf ${{env.gurobi}} -C $RUNNER_TEMP
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/gurobi1001/linux64/lib/:$LD_LIBRARY_PATH" >> $GITHUB_ENV
         echo "GUROBI_VERSION=100" >> $GITHUB_ENV
