@@ -35,7 +35,7 @@ runs:
     - run: tar -xzf ${{env.knitro}}.tar.gz -C $RUNNER_TEMP
       shell: bash
       if: runner.os != 'Windows'
-    - run: unzip ${{env.knitro}}.zip -d $RUNNER_TEMP
+    - run: unzip -q ${{env.knitro}}.zip -d $RUNNER_TEMP
       shell: bash
       if: runner.os == 'Windows'
     - run: cp artelys_lic_5007_casadi-dev_2022-08-24.txt $RUNNER_TEMP
@@ -102,7 +102,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
  
-    - run: unzip ${{env.cplex}}.zip -d $RUNNER_TEMP/CPLEX
+    - run: unzip -q ${{env.cplex}}.zip -d $RUNNER_TEMP/CPLEX
       shell: bash
       if: runner.os == 'Windows'
     - run: echo "PATH=$RUNNER_TEMP/${{env.cplex}}/CPLEX/cplex/bin/x64_win64/;$PATH" >> $GITHUB_ENV
