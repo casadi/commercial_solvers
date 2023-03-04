@@ -102,9 +102,15 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
 
-    - run: Invoke-Expression -Command ".\install_cplex.bat"
-      shell: pwsh
+    - run: ${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
+      shell: Cmd
       if: runner.os == 'Windows'
+    - run: timeout 5
+      shell: Cmd
+      if: runner.os == 'Windows'
+    - run: ls $RUNNER_TEMP/CPLEX
+      shell: bash
+      if: runner.os == 'Windows'      
     # Add to PATH
     - run: |
         ls $RUNNER_TEMP/CPLEX
