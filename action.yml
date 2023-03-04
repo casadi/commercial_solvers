@@ -16,7 +16,7 @@ runs:
         map: |
          {
             "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin", "gurobi": "gurobi10.0.1_linux64.tar.gz"},
-            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SVML-win-x86-64", "cplex_suffix": ".exe", "gurobi": "Gurobi-10.0.1-win64.msi"},
+            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cplex2211_win64", "cplex_suffix": ".zip", "gurobi": "Gurobi-10.0.1-win64.msi"},
             "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg"},
             "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg"}
          }
@@ -101,19 +101,16 @@ runs:
         ./${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
       if: runner.os == 'Linux'
       shell: bash
-
-    - name: Setup headless display
-      uses: pyvista/setup-headless-display-action@v1
-      
-    - run: ${{env.cplex}}${{env.cplex_suffix}} -f github_actions.properties
-      shell: Cmd
-      if: runner.os == 'Windows'
-    - run: timeout 5
-      shell: Cmd
-      if: runner.os == 'Windows'
-    - run: ls $RUNNER_TEMP/CPLEX
+ 
+    - run: unzip ${{env.cplex}}.zip -d $RUNNER_TEMP
       shell: bash
-      if: runner.os == 'Windows'      
+      if: runner.os == 'Windows'
+    - run: echo "PATH=$RUNNER_TEMP/${{env.cplex}}/cplex/bin/x64_win64/;$PATH" >> $GITHUB_ENV
+      if: runner.os == 'Windows'
+      shell: bash
+    - run: ls $RUNNER_TEMP
+      if: runner.os == 'Windows'
+      shell: bash
     # Add to PATH
     - run: |
         ls $RUNNER_TEMP/CPLEX
@@ -145,10 +142,6 @@ runs:
       
     - run: ls $RUNNER_TEMP/CPLEX
       shell: bash
-    - run: |
-            cp CPLEX/cplex/bin/x86-64_osx/libcplex2211.dylib find $RUNNER_TEMP/CPLEX -name "*.dylib"
-      shell: bash
-      if: runner.os == 'Windows'
 
     # Gurobi
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
