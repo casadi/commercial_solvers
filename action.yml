@@ -102,10 +102,10 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
  
-    - run: unzip ${{env.cplex}}.zip -d $RUNNER_TEMP
+    - run: unzip ${{env.cplex}}.zip -d $RUNNER_TEMP/CPLEX
       shell: bash
       if: runner.os == 'Windows'
-    - run: echo "PATH=$RUNNER_TEMP/${{env.cplex}}/cplex/bin/x64_win64/;$PATH" >> $GITHUB_ENV
+    - run: echo "PATH=$RUNNER_TEMP/${{env.cplex}}/CPLEX/cplex/bin/x64_win64/;$PATH" >> $GITHUB_ENV
       if: runner.os == 'Windows'
       shell: bash
     - run: ls $RUNNER_TEMP
@@ -164,7 +164,7 @@ runs:
       shell: bash
       if: runner.os == 'macOS'
     - run: |
-        msiexec /i ${{env.gurobi}} /quiet /qn /norestart /log install.log
-      shell: cmd
+        Start-Process "${{env.gurobi}}" -ArgumentList '/quiet /qn /norestart /log install.log' -Wait
+      shell: pwsh
       if: runner.os == 'Windows'
       
