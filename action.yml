@@ -15,10 +15,10 @@ runs:
         key: "${{runner.os}}-${{runner.arch}}"
         map: |
          {
-            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin", "gurobi": "gurobi10.0.1_linux64.tar.gz"},
-            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cplex2211_win64", "cplex_suffix": ".zip", "gurobi": "Gurobi-10.0.1-win64.msi"},
-            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg"},
-            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg"}
+            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin", "gurobi": "gurobi10.0.1_linux64.tar.gz", "hsl": "hsl-manylinux2014-x64"},
+            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cplex2211_win64", "cplex_suffix": ".zip", "gurobi": "Gurobi-10.0.1-win64.msi", "hsl": "hsl-windows-shared-x64-posix"},
+            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-11"},
+            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-m1"}
          }
         export_to: env
     # Download protected release asset
@@ -181,4 +181,36 @@ runs:
 
     - run: echo "PATH=c:/gurobi1001/win64/bin;$PATH" >> $GITHUB_ENV
       if: runner.os == 'Windows'
+      shell: bash
+
+    # HSL
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: 'jgillis/restricted'
+        file: ${{env.hsl}}.zip
+        token: ${{ inputs.token }}
+    - run: unzip -q ${{env.hsl}}.zip -d $RUNNER_TEMP/hsl
+      shell: bash
+
+    # Add to PATH
+    - run: |
+        echo "LD_LIBRARY_PATH=$RUNNER_TEMP/hsl:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      if: runner.os == 'Linux'
+      shell: bash
+
+    # cfr. https://github.com/pypa/cibuildwheel/issues/816
+    - run: |
+        sudo cp $RUNNER_TEMP/hsl/* /usr/local/lib
+      if: runner.os == 'macOS'
+      shell: bash
+    - run: echo "PATH=$RUNNER_TEMP/hsl;$PATH" >> $GITHUB_ENV
+      if: runner.os == 'Windows'
+      shell: bash
+
+    - run: echo "$PATH"
+      if: runner.os == 'Windows'
+      shell: bash
+
+    - run: echo "$LD_LIBRARY_PATH"
+      if: runner.os == 'Linux'
       shell: bash
