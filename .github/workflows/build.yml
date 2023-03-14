@@ -34,6 +34,7 @@ jobs:
         token: ${{ secrets.JGILLIS_RESTRICTED }}
     - run: unzip coinhsl-2022.11.09.zip -d coinhsl
       shell: bash
+    - run: ls && pwd
     - name: Setup dockcross
       run: |
         docker pull ghcr.io/jgillis/${{ matrix.target }}:production
@@ -100,6 +101,7 @@ jobs:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
       - run: unzip coinhsl-2022.11.09.zip -d coinhsl
         shell: bash
+      - run: ls && pwd
       - name: Cache build dir
         uses: actions/cache@v3.2.3
         with:
@@ -108,5 +110,6 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
+          sudo ln -s ${{ github.workspace }} /work
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'m1') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-11') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
