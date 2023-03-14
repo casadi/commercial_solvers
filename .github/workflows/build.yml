@@ -51,11 +51,23 @@ jobs:
     - name: Build
       run: |
         rm -f build/CMakeCache.txt
-        ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
+        ./dockcross cmake -Bbuild -DCMAKE_INSTALL_PREFIX=/work/install -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
 
         # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
         # Needed to make CoinUtils work
-        ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
+        ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build  -v
+        ./dockcross cmake --build build --target install -v
+    - name: build archives
+      run: |
+        zip -q hsl-${{matrix.image}}.zip install/casadi/lib*hsl*
+    - name: Upload files to a GitHub release
+      uses: svenstaro/upload-release-action@2.4.0
+      with:
+        overwrite: true
+        tag: Perpetual
+        file: hsl-${{matrix.image}}.zip
+        prerelease: true
+        repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
 
   matrix-arch-mac:
     runs-on: ubuntu-20.04
@@ -110,5 +122,18 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'m1') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-11') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -DBUILD_HSL_SRC=${{ github.workspace }}/coinhsl/coinhsl-2022.11.09 -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'m1') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-11') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -DBUILD_HSL_SRC=${{ github.workspace }}/coinhsl/coinhsl-2022.11.09 -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
+          cmake --build build --target install -v
+      - name: build archives
+        run: |
+          zip -q hsl-${{matrix.image}}.zip install/casadi/lib*hsl*
+      
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.4.0
+        with:
+          overwrite: true
+          tag: Perpetual
+          file: hsl-${{matrix.image}}.zip
+          repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
+          prerelease: true
