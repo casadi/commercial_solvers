@@ -4,7 +4,7 @@ on: push
 
 env:
   cache-suffix: v1
-  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_HSL=ON -DWITH_BUILD_HSL=ON -DBUILD_HSL_SRC=/work/coinhsl/coinhsl-2022.11.09"
+  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_HSL=ON -DWITH_METIS=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_HSL=ON -DBUILD_HSL_SRC=/work/coinhsl/coinhsl-2022.11.09"
   build_flags_32bit: ""
   build_flags_manylinux1: ""
   build_flags_windows: ""
