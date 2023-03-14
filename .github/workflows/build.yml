@@ -93,6 +93,13 @@ jobs:
           ref: jgillis-patch-14
           fetch-depth: 0 # for git-restore-mtime
       - uses: chetan/git-restore-mtime-action@v1.2
+      - uses: dsaltares/fetch-gh-release-asset@1.1.0
+        with:
+          repo: jgillis/restricted
+          file: coinhsl-2022.11.09.zip
+          token: ${{ secrets.JGILLIS_RESTRICTED }}
+      - run: unzip coinhsl-2022.11.09.zip -d coinhsl
+        shell: bash
       - name: Cache build dir
         uses: actions/cache@v3.2.3
         with:
