@@ -23,7 +23,10 @@ jobs:
     - uses: actions/checkout@v3.3.0
       with:
         repository: casadi/casadi
-        ref: develop
+        ref: jgillis-patch-14
+        fetch-depth: 0 # for git-restore-mtime
+    - run: ls && pwd
+    - uses: chetan/git-restore-mtime-action@v1.2
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
         repo: jgillis/restricted
@@ -52,3 +55,51 @@ jobs:
         # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
         # Needed to make CoinUtils work
         ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
+
+  matrix-arch-mac:
+    runs-on: ubuntu-20.04
+    steps:
+      - id: build-matrix
+        uses: jgillis/setup-build-matrix@v1.2.0-if
+        with:
+          config: |
+            matrix:
+              image: [macos-11]
+            operations:
+              - type: append
+                if: ${{ vars.BLESSED_REPO == 'yes' }}
+                matrix:
+                  image: [macos-m1]
+      - run: echo ${{ steps.build-matrix.outputs.matrix }}
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+
+  core-osx:
+    needs: [matrix-arch-mac]
+    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix-arch-mac.outputs.matrix) }}
+    steps:
+      - run: echo "${{ vars.BLESSED_REPO }} ${{ vars.BLESSED_REPO }}"
+      - uses: casadi/action-setup-compiler@master
+        with:
+          cache-suffix: ''
+          target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
+      - run: brew install pkg-config
+      - uses: actions/checkout@v3.3.0
+        with:
+          repository: casadi/casadi
+          ref: jgillis-patch-14
+          fetch-depth: 0 # for git-restore-mtime
+      - uses: chetan/git-restore-mtime-action@v1.2
+      - name: Cache build dir
+        uses: actions/cache@v3.2.3
+        with:
+          key: core-build-${{matrix.image}}-${{env.cache-suffix}}
+          path: build
+      - name: Build
+        run: |
+          rm -f build/CMakeCache.txt
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'m1') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-11') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
