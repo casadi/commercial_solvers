@@ -1,0 +1,54 @@
+name: build
+
+on: push
+
+env:
+  cache-suffix: v1
+  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_HSL=ON -DWITH_BUILD_HSL=ON -DBUILD_HSL_SRC=/work/coinhsl"
+  build_flags_32bit: ""
+  build_flags_manylinux1: ""
+  build_flags_windows: ""
+  build_flags_mac: "-DWITH_BUILD_LAPACK=OFF"
+  build_flags_mac_intel: ""
+  build_flags_mac_m1: ""
+
+jobs:
+  main-dockcross:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        repository: casadi/casadi
+        ref: develop
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: jgillis/restricted
+        file: coinhsl-2022.11.09.zip
+        token: ${{ secrets.JGILLIS_RESTRICTED }}
+    - run: unzip coinhsl-2022.11.09.zip -d coinhsl
+      shell: bash
+    - name: Setup dockcross
+      run: |
+        docker pull ghcr.io/jgillis/${{ matrix.target }}:production
+        docker image inspect ghcr.io/jgillis/${{ matrix.target }}:production
+        docker run --rm ghcr.io/jgillis/${{ matrix.target }}:production > dockcross
+        chmod +x dockcross
+        pwd
+        ls -al dockcross
+    - name: Cache build dir
+      uses: actions/cache@v3.2.3
+      with:
+        key: core-build-${{ matrix.target }}-${{env.cache-suffix}}
+        path: build
+    - name: Build
+      run: |
+        rm -f build/CMakeCache.txt
+        ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
+
+        # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
+        # Needed to make CoinUtils work
+        ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
