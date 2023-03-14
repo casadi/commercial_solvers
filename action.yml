@@ -149,13 +149,21 @@ runs:
         repo: 'jgillis/restricted'
         file: ${{env.gurobi}}
         token: ${{ inputs.token }}
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: 'jgillis/restricted'
+        file: gurobi.lic
+        token: ${{ inputs.token }}
     - run: |
         echo "GUROBI_VERSION=100" >> $GITHUB_ENV
+        mv gurobi.lic $RUNNER_TEMP/gurobi.lic
+        echo "GRB_LICENSE_FILE=$RUNNER_TEMP/gurobi.lic" >> $GITHUB_ENV
       shell: bash
     - run: |
         tar -xzf ${{env.gurobi}} -C $RUNNER_TEMP
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/gurobi1001/linux64/lib/:$LD_LIBRARY_PATH" >> $GITHUB_ENV
         echo "GUROBI_VERSION=100" >> $GITHUB_ENV
+        echo ""
         ls $RUNNER_TEMP
         ls $RUNNER_TEMP/gurobi1001/linux64/lib
       shell: bash
@@ -171,6 +179,6 @@ runs:
       shell: pwsh
       if: runner.os == 'Windows'
 
-    - run: echo "PATh=c:/gurobi1001/win64/bin;$PATH" >> $GITHUB_ENV
+    - run: echo "PATH=c:/gurobi1001/win64/bin;$PATH" >> $GITHUB_ENV
       if: runner.os == 'Windows'
       shell: bash
