@@ -64,8 +64,8 @@ jobs:
       uses: svenstaro/upload-release-action@2.4.0
       with:
         overwrite: true
-        tag: Perpetual
-        file: hsl-${{matrix.image}}.zip
+        tag: perpetual
+        file: hsl-${{matrix.target}}.zip
         prerelease: true
         repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
         repo_name: jgillis/restricted
@@ -135,7 +135,7 @@ jobs:
         uses: svenstaro/upload-release-action@2.4.0
         with:
           overwrite: true
-          tag: Perpetual
+          tag: perpetual
           file: hsl-${{matrix.image}}.zip
           repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
           prerelease: true
