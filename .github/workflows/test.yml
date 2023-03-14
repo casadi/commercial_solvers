@@ -4,7 +4,7 @@ on: push
 
 jobs:
   main:
-    runs-on: windows-latest
+    runs-on: [windows-latest,macos-11,self-hosted,ubuntu-20.04]
 
     steps:
     - uses: actions/checkout@v3.3.0
@@ -12,6 +12,4 @@ jobs:
       with:
         token: ${{ secrets.JGILLIS_RESTRICTED }}
     - run: echo "$LD_LIBRARY_PATH"
-    - run: pwd
-    - run: ls
-    - run: /home/runner/work/casadi/commercial_solvers/knitro-13.2.0-Linux-64/lib/libiomp5.so
+    - run: echo "$PATH"
