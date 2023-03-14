@@ -59,7 +59,7 @@ jobs:
         ./dockcross cmake --build build --target install -v
     - name: build archives
       run: |
-        zip -q hsl-${{matrix.image}}.zip install/casadi/lib*hsl*
+        zip -q hsl-${{matrix.target}}.zip install/casadi/lib*hsl*
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.4.0
       with:
