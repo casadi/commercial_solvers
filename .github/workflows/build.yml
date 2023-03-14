@@ -68,6 +68,7 @@ jobs:
         file: hsl-${{matrix.image}}.zip
         prerelease: true
         repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
+        repo_name: jgillis/restricted
 
 
   matrix-arch-mac:
@@ -138,3 +139,4 @@ jobs:
           file: hsl-${{matrix.image}}.zip
           repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
           prerelease: true
+          repo_name: jgillis/restricted
