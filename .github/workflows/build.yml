@@ -58,6 +58,13 @@ jobs:
         # Needed to make CoinUtils work
         ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build  -v
         ./dockcross cmake --build build --target install -v
+    - uses: jgillis/universal_grafter@master
+      if: "!contains(matrix.arch, 'windows')"
+      with:
+        source_path: install/casadi
+        destination_path: install/casadi
+        dockcross: ${{ matrix.target }}
+        bitness: 64
     - name: build archives
       run: |
         zip -j -q hsl-${{matrix.target}}.zip install/casadi/lib*hsl*
@@ -129,6 +136,11 @@ jobs:
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'m1') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-11') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -DBUILD_HSL_SRC=${{ github.workspace }}/coinhsl/coinhsl-2022.11.09 -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
           cmake --build build --target install -v
+      - uses: jgillis/universal_grafter@master
+        with:
+          source_path: install/casadi
+          destination_path: install/casadi
+          search_paths: ${{env.COMPILER_LIB_SEARCH_PATH}}
       - name: build archives
         run: |
           zip -j -q hsl-${{matrix.image}}.zip install/casadi/lib*hsl*
