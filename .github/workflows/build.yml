@@ -40,7 +40,7 @@ jobs:
       run: |
         docker pull ghcr.io/jgillis/${{ matrix.target }}:production
         docker image inspect ghcr.io/jgillis/${{ matrix.target }}:production
-        docker run --rm ghcr.io/jgillis/${{ matrix.target }}:production > dockcross
+        docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.target }}:production ghcr.io/jgillis/${{ matrix.target }}:production > dockcross
         chmod +x dockcross
         pwd
         ls -al dockcross
