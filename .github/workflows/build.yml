@@ -4,7 +4,7 @@ on: push
 
 env:
   cache-suffix: v1
-  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_HSL=ON -DWITH_METIS=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_HSL=ON -DBUILD_HSL_SRC=/work/coinhsl/coinhsl-2022.11.09"
+  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_HSL=OFF -DWITH_METIS=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_HSL=OFF -DBUILD_HSL_SRC=/work/coinhsl/coinhsl-2022.11.09"
   build_flags_32bit: ""
   build_flags_manylinux1: ""
   build_flags_windows: ""
@@ -57,18 +57,18 @@ jobs:
         # Needed to make CoinUtils work
         ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build  -v
         ./dockcross cmake --build build --target install -v
-    - name: build archives
-      run: |
-        zip -j -q hsl-${{matrix.target}}.zip install/casadi/lib*hsl*
-    - name: Upload files to a GitHub release
-      uses: svenstaro/upload-release-action@2.4.0
-      with:
-        overwrite: true
-        tag: perpetual
-        file: hsl-${{matrix.target}}.zip
-        prerelease: true
-        repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
-        repo_name: jgillis/restricted
+    #- name: build archives
+    #  run: |
+    #    zip -j -q hsl-${{matrix.target}}.zip install/casadi/lib*hsl*
+    #- name: Upload files to a GitHub release
+    #  uses: svenstaro/upload-release-action@2.4.0
+    #  with:
+    #    overwrite: true
+    #    tag: perpetual
+    #    file: hsl-${{matrix.target}}.zip
+    #    prerelease: true
+    #    repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
+    #    repo_name: jgillis/restricted
 
 
   matrix-arch-mac:
