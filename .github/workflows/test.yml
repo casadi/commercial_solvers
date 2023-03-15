@@ -4,8 +4,11 @@ on: push
 
 jobs:
   main:
-    runs-on: [windows-latest,macos-11,self-hosted,ubuntu-20.04]
-
+    runs-on: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [windows-latest,macos-11,self-hosted,ubuntu-20.04]
     steps:
     - uses: actions/checkout@v3.3.0
     - uses: ./
