@@ -208,6 +208,8 @@ runs:
       shell: bash
 
     # Worhp
+    - run: rm -f ${{ github.workspace }}/casadi/casadi/libcasadi_nlpsol_worhp*
+      shell: bash
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
         repo: 'jgillis/restricted'
