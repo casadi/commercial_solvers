@@ -214,7 +214,8 @@ runs:
         file: ${{env.worhp}}.zip
         token: ${{ inputs.token }}
       if: runner.os != 'macOS'
-    - run: unzip -q ${{env.worhp}}.zip -d $RUNNER_TEMP/hsl
+    - run: unzip -q ${{env.worhp}}.zip -d $RUNNER_TEMP/worhp
+      if: runner.os != 'macOS'
       shell: bash
 
     # Add to PATH
