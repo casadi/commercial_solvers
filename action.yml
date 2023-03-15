@@ -218,6 +218,15 @@ runs:
       if: runner.os != 'macOS'
       shell: bash
 
+    - run: ls $RUNNER_TEMP/worhp
+      if: runner.os != 'macOS'
+      shell: bash
+
+    # Worhp license is mac-adress based, so we skip it on ci
+    - run: |
+        echo "SKIP_WORHP_TESTS=ON" >> $GITHUB_ENV
+      shell: bash
+
     # Add to PATH
     - run: |
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/worhp/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
