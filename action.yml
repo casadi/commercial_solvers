@@ -160,13 +160,6 @@ runs:
         mv gurobi.lic $RUNNER_TEMP/gurobi.lic
         echo "GRB_LICENSE_FILE=$RUNNER_TEMP/gurobi.lic" >> $GITHUB_ENV
       shell: bash
-      if: runner.os != 'Windows'
-    - run: |
-        echo "GUROBI_VERSION=100" >> $GITHUB_ENV
-        mv gurobi.lic $RUNNER_TEMP/gurobi.lic
-        echo "GRB_LICENSE_FILE=/d/a/_temp/gurobi.lic" >> $GITHUB_ENV
-      shell: bash
-      if: runner.os == 'Windows'
     - run: |
         tar -xzf ${{env.gurobi}} -C $RUNNER_TEMP
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/gurobi1001/linux64/lib/:$LD_LIBRARY_PATH" >> $GITHUB_ENV
@@ -211,7 +204,7 @@ runs:
         sudo cp $RUNNER_TEMP/hsl/* /usr/local/lib
       if: runner.os == 'macOS'
       shell: bash
-    - run: echo "PATH=/d/a/_temp/hsl:PATH" >> $GITHUB_ENV
+    - run: echo "PATH=/d/a/_temp/hsl:$PATH" >> $GITHUB_ENV
       if: runner.os == 'Windows'
       shell: bash
 
@@ -245,7 +238,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
 
-    - run: echo "PATH=/d/a/_temp/worhp/bin:PATH" >> $GITHUB_ENV
+    - run: echo "PATH=/d/a/_temp/worhp/bin:$PATH" >> $GITHUB_ENV
       if: runner.os == 'Windows'
       shell: bash
 
