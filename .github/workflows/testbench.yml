@@ -7,15 +7,23 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3.3.0
+    - run: where takeown
+      shell: cmd
     - run: echo "$PATH"
       shell: bash
+    - run: echo "%PATH%"
+      shell: cmd
     - run: echo $env:Path
       shell: powershell
     - uses: ilammy/msvc-dev-cmd@v1.12.1
     - run: echo "$PATH"
       shell: bash
+    - run: echo "%PATH%"
+      shell: cmd
     - run: echo $env:Path
       shell: powershell
+    - run: where takeown
+      shell: cmd
     - uses: conda-incubator/setup-miniconda@v2.2.0
       with:
         python-version: "3.10"
