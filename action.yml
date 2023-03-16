@@ -238,7 +238,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
 
-    - run: echo "PATH=%RUNNER_TEMP%\worhp\bin;%PATH%" >> $Env:GITHUB_ENV
+    - run: echo "PATH=$RUNNER_TEMP\worhp\bin;$PATH" >> $Env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: powershell
 
