@@ -24,6 +24,17 @@ jobs:
       shell: powershell
     - run: where takeown
       shell: cmd
+    - uses: ./
+      with:
+        token: ${{ secrets.JGILLIS_RESTRICTED }}
+    - run: echo "$PATH"
+      shell: bash
+    - run: echo "%PATH%"
+      shell: cmd
+    - run: echo $env:Path
+      shell: powershell
+    - run: where takeown
+      shell: cmd
     - uses: conda-incubator/setup-miniconda@v2.2.0
       with:
         python-version: "3.10"
