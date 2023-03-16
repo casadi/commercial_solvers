@@ -1,4 +1,4 @@
-name: test
+name: testbench
 
 on: push
 
@@ -18,6 +18,6 @@ jobs:
       shell: powershell
     - uses: conda-incubator/setup-miniconda@v2.2.0
       with:
-        python-version: 3.10
+        python-version: "3.10"
         activate-environment: py310
         auto-update-conda: true
