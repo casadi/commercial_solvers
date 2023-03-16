@@ -237,7 +237,14 @@ runs:
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/worhp/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
       if: runner.os == 'Linux'
       shell: bash
+    - run: echo "PATH=$RUNNER_TEMP/bar/var;$PATH" >> $GITHUB_ENV
+      if: runner.os == 'Windows'
+      shell: bash
     - run: echo "PATH=$RUNNER_TEMP/worhp/bin;$PATH" >> $GITHUB_ENV
+      if: runner.os == 'Windows'
+      shell: bash
+
+    - run: echo "PATH=$RUNNER_TEMP/foo/var;$PATH" >> $GITHUB_ENV
       if: runner.os == 'Windows'
       shell: bash
 
