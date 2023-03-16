@@ -28,6 +28,7 @@ jobs:
       with:
         token: ${{ secrets.JGILLIS_RESTRICTED }}
     - run: cat $GITHUB_ENV
+      shell: bash
     - run: echo "$PATH"
       shell: bash
     - run: echo "%PATH%"
