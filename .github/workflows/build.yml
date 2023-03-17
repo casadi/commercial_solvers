@@ -65,6 +65,7 @@ jobs:
         destination_path: install/casadi
         dockcross: ${{ matrix.target }}
         bitness: 64
+        skip_libs: ''
     - name: build archives
       run: |
         zip -j -q hsl-${{matrix.target}}.zip install/casadi/lib*hsl*
@@ -141,6 +142,7 @@ jobs:
           source_path: install/casadi
           destination_path: install/casadi
           search_paths: ${{env.COMPILER_LIB_SEARCH_PATH}}
+          skip_libs: ''
       - name: build archives
         run: |
           zip -j -q hsl-${{matrix.image}}.zip install/casadi/lib*hsl*
