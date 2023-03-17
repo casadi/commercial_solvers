@@ -58,8 +58,12 @@ runs:
       shell: bash
     - run: echo "$PATH"
       shell: bash
-      
-    - run: echo "PATH=$RUNNER_TEMP/${{env.knitro}}/lib;$PATH" >> $GITHUB_ENV
+
+    - run: echo "$env:PATH"
+      if: runner.os == 'Windows'
+      shell: powershell
+
+    - run: echo "PATH=$RUNNER_TEMP\${{env.knitro}}\lib;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: bash
     - run: echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so"
@@ -106,9 +110,14 @@ runs:
     - run: unzip -q ${{env.cplex}}.zip -d $RUNNER_TEMP/CPLEX
       shell: bash
       if: runner.os == 'Windows'
-    - run: echo "PATH=$RUNNER_TEMP/${{env.cplex}}/CPLEX/cplex/bin/x64_win64/;$PATH" >> $GITHUB_ENV
+
+    - run: echo "$env:PATH"
       if: runner.os == 'Windows'
-      shell: bash
+      shell: powershell
+
+    - run: echo "PATH=$RUNNER_TEMP\${{env.cplex}}\CPLEX\cplex\bin\x64_win64;$env:PATH" >> $env:GITHUB_ENV
+      if: runner.os == 'Windows'
+      shell: powershell
     - run: ls $RUNNER_TEMP
       if: runner.os == 'Windows'
       shell: bash
@@ -180,6 +189,9 @@ runs:
       shell: pwsh
       if: runner.os == 'Windows'
 
+    - run: echo "$env:PATH"
+      if: runner.os == 'Windows'
+      shell: powershell
     - run: echo "PATH=C:\gurobi1001\win64\bin;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: powershell
@@ -204,10 +216,19 @@ runs:
         sudo cp $RUNNER_TEMP/hsl/* /usr/local/lib
       if: runner.os == 'macOS'
       shell: bash
+
+    - run: echo "$env:PATH"
+      if: runner.os == 'Windows'
+      shell: powershell
+
     - run: echo "PATH=$env:RUNNER_TEMP\hsl;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: powershell
 
+    - run: echo "$env:PATH"
+      if: runner.os == 'Windows'
+      shell: powershell
+      
     # Worhp
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
