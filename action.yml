@@ -59,7 +59,7 @@ runs:
     - run: echo "$PATH"
       shell: bash
 
-    - run: echo "PATH=$RUNNER_TEMP\${{env.knitro}}\lib;$env:PATH" >> $env:GITHUB_ENV
+    - run: echo "PATH=$env:RUNNER_TEMP\${{env.knitro}}\lib;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: powershell
     - run: echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so"
@@ -107,7 +107,7 @@ runs:
       shell: bash
       if: runner.os == 'Windows'
 
-    - run: echo "PATH=$RUNNER_TEMP\${{env.cplex}}\CPLEX\cplex\bin\x64_win64;$env:PATH" >> $env:GITHUB_ENV
+    - run: echo "PATH=$env:RUNNER_TEMP\${{env.cplex}}\CPLEX\cplex\bin\x64_win64;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: powershell
     - run: ls $RUNNER_TEMP
