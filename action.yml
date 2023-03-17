@@ -180,9 +180,9 @@ runs:
       shell: pwsh
       if: runner.os == 'Windows'
 
-    - run: echo "PATH=/c/gurobi1001/win64/bin:$PATH" >> $GITHUB_ENV
+    - run: echo "PATH=C:\gurobi1001\win64\bin;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
-      shell: bash
+      shell: powershell
 
     # HSL
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
@@ -204,9 +204,9 @@ runs:
         sudo cp $RUNNER_TEMP/hsl/* /usr/local/lib
       if: runner.os == 'macOS'
       shell: bash
-    - run: echo "PATH=/d/a/_temp/hsl:$PATH" >> $GITHUB_ENV
+    - run: echo "PATH=$env:RUNNER_TEMP\hsl;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
-      shell: bash
+      shell: powershell
 
     # Worhp
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
@@ -238,7 +238,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
 
-    - run: echo "PATH=/d/a/_temp/worhp/bin:$PATH" >> $GITHUB_ENV
+    - run: echo "PATH=$env:RUNNER_TEMP\worhp\bin;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: bash
 
