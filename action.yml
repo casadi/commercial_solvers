@@ -61,7 +61,7 @@ runs:
 
     - run: echo "PATH=$RUNNER_TEMP\${{env.knitro}}\lib;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
-      shell: bash
+      shell: powershell
     - run: echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so"
       if: runner.os != 'Windows'
       shell: bash
