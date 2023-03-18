@@ -242,7 +242,7 @@ runs:
 
     - run: echo "PATH=$env:RUNNER_TEMP\worhp\bin;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
-      shell: bash
+      shell: powershell
 
     - run: echo "$LD_LIBRARY_PATH"
       if: runner.os == 'Linux'
