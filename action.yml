@@ -107,9 +107,21 @@ runs:
       shell: bash
       if: runner.os == 'Windows'
 
-    - run: echo "PATH=$env:RUNNER_TEMP\${{env.cplex}}\CPLEX\cplex\bin\x64_win64;$env:PATH" >> $env:GITHUB_ENV
+    - run: echo "PATH=$env:RUNNER_TEMP\CPLEX\cplex\bin\x64_win64;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: powershell
+    - run: ls $RUNNER_TEMP/CPLEX
+      if: runner.os == 'Windows'
+      shell: bash  
+    - run: ls $RUNNER_TEMP/CPLEX/cplex
+      if: runner.os == 'Windows'
+      shell: bash  
+    - run: ls $RUNNER_TEMP/CPLEX/cplex/bin
+      if: runner.os == 'Windows'
+      shell: bash
+    - run: ls $RUNNER_TEMP/CPLEX/cplex/bin/x64_win64
+      if: runner.os == 'Windows'
+      shell: bash
     - run: ls $RUNNER_TEMP
       if: runner.os == 'Windows'
       shell: bash
