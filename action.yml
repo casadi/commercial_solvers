@@ -44,7 +44,7 @@ runs:
     # Add to PATH
     - run: |
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/${{env.knitro}}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so" >> $GITHUB_ENV
+        //echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so" >> $GITHUB_ENV
       if: runner.os == 'Linux'
       shell: bash
       
