@@ -102,6 +102,8 @@ runs:
         echo "SNOPT_LICENSE=$RUNNER_TEMP/snopt/snopt7.lic" >> $GITHUB_ENV
       if: runner.os != 'Windows'
       shell: bash
+    - run: ls "$RUNNER_TEMP"
+    - run: ls "$RUNNER_TEMP/snopt"
 
     #  CPLEX
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
