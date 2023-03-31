@@ -96,6 +96,7 @@ runs:
       shell: bash
     - run: |
         sudo cp $RUNNER_TEMP/snopt/* /usr/local/lib
+        find / -name libgfortran5 2>/dev/null
       if: runner.os == 'macOS'
       shell: bash
     - run: |
