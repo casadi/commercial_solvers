@@ -95,12 +95,24 @@ runs:
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/snopt:$LD_LIBRARY_PATH" >> $GITHUB_ENV
       if: runner.os == 'Linux'
       shell: bash
+      
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: casadi/commercial_solvers
+        file:  libgfortran.5.dylib
+      if: runner.os == 'macOS'
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: casadi/commercial_solvers
+        file:  libquadmath.0.dylib
+      if: runner.os == 'macOS'
     - run: |
         sudo cp $RUNNER_TEMP/snopt/* /usr/local/lib
         sudo mkdir -p /opt/local/lib/libgcc/
-        sudo ln -s /Users/runner/work/casadi/casadi/casadi/libgfortran.5.dylib /opt/local/lib/libgcc/libgfortran.5.dylib
-        sudo ln -s /Users/runner/work/casadi/casadi/casadi/libquadmath.0.dylib /opt/local/lib/libgcc/libquadmath.0.dylib
-        #find / -name libgfortran5 2>/dev/null
+        cp libgfortran.5.dylib $RUNNER_TEMP/snopt
+        cp libquadmath.0.dylib $RUNNER_TEMP/snopt
+        sudo ln -s $RUNNER_TEMP/snopt/libgfortran.5.dylib /opt/local/lib/libgcc/libgfortran.5.dylib
+        sudo ln -s $RUNNER_TEMP/snopt/libquadmath.0.dylib /opt/local/lib/libgcc/libquadmath.0.dylib
       if: runner.os == 'macOS'
       shell: bash
     - run: |
