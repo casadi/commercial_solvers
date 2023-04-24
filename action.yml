@@ -99,6 +99,7 @@ runs:
         sudo cp $RUNNER_TEMP/snopt/* /usr/local/lib
         sudo mkdir -p /opt/local/lib/libgcc/
         sudo ln -s /Users/runner/work/casadi/casadi/casadi/libgfortran.5.dylib /opt/local/lib/libgcc/libgfortran.5.dylib
+        sudo ln -s /Users/runner/work/casadi/casadi/casadi/libquadmath.0.dylib /opt/local/lib/libgcc/libquadmath.0.dylib
         #find / -name libgfortran5 2>/dev/null
       if: runner.os == 'macOS'
       shell: bash
