@@ -114,7 +114,7 @@ runs:
       with:
         repo: casadi/commercial_solvers
         file:  libgfortran.so.4
-        target: $RUNNER_TEMP/worhp/snopt/libgfortran.so.4
+        target: $RUNNER_TEMP/snopt/libgfortran.so.4
       if: runner.os == 'linux'
       
     #  CPLEX
