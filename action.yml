@@ -109,8 +109,6 @@ runs:
       shell: bash
     - run: ls "$RUNNER_TEMP"
       shell: bash
-    - run: ls "$RUNNER_TEMP/snopt"
-      shell: bash
 
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
@@ -118,6 +116,8 @@ runs:
         file:  libgfortran.so.4
         target: $RUNNER_TEMP/snopt/libgfortran.so.4
       if: runner.os == 'linux'
+    - run: ls "$RUNNER_TEMP/snopt"
+      shell: bash
       
     #  CPLEX
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
