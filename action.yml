@@ -97,6 +97,7 @@ runs:
       shell: bash
     - run: |
         sudo cp $RUNNER_TEMP/snopt/* /usr/local/lib
+        sudo ln -s /Users/runner/work/casadi/casadi/casadi/libgfortran.5.dylib /opt/local/lib/libgcc/libgfortran.5.dylib
         #find / -name libgfortran5 2>/dev/null
       if: runner.os == 'macOS'
       shell: bash
