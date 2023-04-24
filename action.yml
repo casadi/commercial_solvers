@@ -44,7 +44,8 @@ runs:
     # Add to PATH
     - run: |
         echo "LD_LIBRARY_PATH=$RUNNER_TEMP/${{env.knitro}}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so" >> $GITHUB_ENV
+        # Leads to `MATLAB: detail/MvmLocalBoundMethods.cpp:112: static void mvm::detail::MvmLocalBoundMethods::initMethods(bool): Assertion `Failed to open local mvm library: /usr/local/MATLAB/R2023a/bin/glnxa64/libmwgraphblas.so.7: undefined symbol: GOMP_loop_nonmonotonic_dynamic_start, version VERSION' failed.`
+        #echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so" >> $GITHUB_ENV
       if: runner.os == 'Linux'
       shell: bash
       
