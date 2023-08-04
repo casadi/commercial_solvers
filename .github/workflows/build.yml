@@ -4,7 +4,7 @@ on: push
 
 env:
   cache-suffix: v1
-  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_HSL=ON -DWITH_METIS=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_HSL=ON -DBUILD_HSL_SRC=/work/coinhsl/coinhsl-2022.11.09"
+  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_HSL=ON -DWITH_METIS=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_HSL=ON -DBUILD_HSL_SRC=/work/coinhsl/coinhsl-2022.11.09 -DWITH_BUILD_BQBD=ON -DBUILD_HSL_BQPD=/work/bqpd"
   build_flags_32bit: ""
   build_flags_manylinux1: ""
   build_flags_windows: ""
@@ -34,6 +34,14 @@ jobs:
         token: ${{ secrets.JGILLIS_RESTRICTED }}
     - run: unzip coinhsl-2022.11.09.zip -d coinhsl
       shell: bash
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: jgillis/restricted
+        file: bqpd.zip
+        token: ${{ secrets.JGILLIS_RESTRICTED }}
+    - run: unzip bqpd.zip -d bqpd
+      shell: bash
+    - run: ls bqpd
     - run: cat coinhsl/coinhsl-2022.11.09/Makefile.in
     - run: ls && pwd
     - name: Setup dockcross
@@ -78,7 +86,18 @@ jobs:
         prerelease: true
         repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
         repo_name: jgillis/restricted
-
+    - name: build archives
+      run: |
+        zip -j -q bqpd-${{matrix.target}}.zip install/casadi/lib*bqpd*
+    - name: Upload files to a GitHub release
+      uses: svenstaro/upload-release-action@2.4.0
+      with:
+        overwrite: true
+        tag: perpetual
+        file: bqpd-${{matrix.target}}.zip
+        prerelease: true
+        repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
+        repo_name: jgillis/restricted
 
   matrix-arch-mac:
     runs-on: ubuntu-20.04
@@ -125,6 +144,13 @@ jobs:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
       - run: unzip coinhsl-2022.11.09.zip -d coinhsl
         shell: bash
+      - uses: dsaltares/fetch-gh-release-asset@1.1.0
+        with:
+          repo: jgillis/restricted
+          file: bqpd.zip
+          token: ${{ secrets.JGILLIS_RESTRICTED }}
+      - run: unzip bqpd.zip -d bqpd
+        shell: bash
       - run: ls && pwd
       - name: Cache build dir
         uses: actions/cache@v3.2.3
@@ -153,6 +179,19 @@ jobs:
           overwrite: true
           tag: perpetual
           file: hsl-${{matrix.image}}.zip
+          repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
+          prerelease: true
+          repo_name: jgillis/restricted
+      - name: build archives
+        run: |
+          zip -j -q bqpd-${{matrix.image}}.zip install/casadi/lib*bqpd*
+      
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.4.0
+        with:
+          overwrite: true
+          tag: perpetual
+          file: bqpd-${{matrix.image}}.zip
           repo_token: ${{ secrets.JGILLIS_RESTRICTED }}
           prerelease: true
           repo_name: jgillis/restricted
