@@ -4,7 +4,7 @@ on: push
 
 env:
   cache-suffix: v1
-  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_HSL=ON -DWITH_METIS=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_HSL=ON -DBUILD_HSL_SRC=/work/coinhsl/coinhsl-2022.11.09 -DWITH_BUILD_BQBD=ON -DBUILD_HSL_BQPD=/work/bqpd"
+  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_HSL=ON -DWITH_METIS=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_HSL=ON -DBUILD_HSL_SRC=/work/coinhsl/coinhsl-2022.11.09 -DWITH_BQBD=ON -DWITH_BUILD_BQBD=ON -DBUILD_BQPD_SRC=/work/bqpd"
   build_flags_32bit: ""
   build_flags_manylinux1: ""
   build_flags_windows: ""
@@ -39,7 +39,7 @@ jobs:
         repo: jgillis/restricted
         file: bqpd.zip
         token: ${{ secrets.JGILLIS_RESTRICTED }}
-    - run: unzip bqpd.zip -d bqpd
+    - run: unzip bqpd.zip
       shell: bash
     - run: ls bqpd
     - run: cat coinhsl/coinhsl-2022.11.09/Makefile.in
@@ -149,7 +149,7 @@ jobs:
           repo: jgillis/restricted
           file: bqpd.zip
           token: ${{ secrets.JGILLIS_RESTRICTED }}
-      - run: unzip bqpd.zip -d bqpd
+      - run: unzip bqpd.zip
         shell: bash
       - run: ls && pwd
       - name: Cache build dir
