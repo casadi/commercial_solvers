@@ -15,10 +15,10 @@ runs:
         key: "${{runner.os}}-${{runner.arch}}"
         map: |
          {
-            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin", "gurobi": "gurobi10.0.1_linux64.tar.gz", "hsl": "hsl-manylinux2014-x64", "worhp": "worhp_1.15_ubuntu2004", "snopt": "libsnopt7c_linux"},
-            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cplex2211_win64", "cplex_suffix": ".zip", "gurobi": "Gurobi-10.0.1-win64.msi", "hsl": "hsl-windows-shared-x64-posix", "worhp": "worhp_1.15-0_win64", "snopt": "libsnopt7_win"},
-            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-11", "snopt": "libsnopt7c_mac"},
-            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-m1", "snopt": "libsnopt7c_mac"}
+            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin", "gurobi": "gurobi10.0.1_linux64.tar.gz", "hsl": "hsl-manylinux2014-x64", "bqpd": "bqpd-manylinux2014-x64", "worhp": "worhp_1.15_ubuntu2004", "snopt": "libsnopt7c_linux"},
+            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cplex2211_win64", "cplex_suffix": ".zip", "gurobi": "Gurobi-10.0.1-win64.msi", "hsl": "hsl-windows-shared-x64-posix", "bqpd": "bqpd-windows-shared-x64-posix", "worhp": "worhp_1.15-0_win64", "snopt": "libsnopt7_win"},
+            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-11", "bqpd": "bqpd-macos-11", "snopt": "libsnopt7c_mac"},
+            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-m1", "bqpd": "bqpd-macos-m1", "snopt": "libsnopt7c_mac"}
          }
         export_to: env
     # Download protected release asset
@@ -285,6 +285,33 @@ runs:
     - run: echo "PATH=$env:RUNNER_TEMP\hsl;$env:PATH" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: powershell
+
+
+    # BQPD
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: 'jgillis/restricted'
+        file: ${{env.bqpd}}.zip
+        token: ${{ inputs.token }}
+    - run: unzip -q ${{env.bqpd}}.zip -d $RUNNER_TEMP/bqpd
+      shell: bash
+
+    # Add to PATH
+    - run: |
+        echo "LD_LIBRARY_PATH=$RUNNER_TEMP/bqpd:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      if: runner.os == 'Linux'
+      shell: bash
+
+    # cfr. https://github.com/pypa/cibuildwheel/issues/816
+    - run: |
+        sudo cp $RUNNER_TEMP/bqpd/* /usr/local/lib
+      if: runner.os == 'macOS'
+      shell: bash
+
+    - run: echo "PATH=$env:RUNNER_TEMP\bqpd;$env:PATH" >> $env:GITHUB_ENV
+      if: runner.os == 'Windows'
+      shell: powershell
+
 
     # Worhp
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
