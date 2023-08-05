@@ -67,7 +67,7 @@ jobs:
         ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build  -v
         ./dockcross cmake --build build --target install -v
     - uses: jgillis/universal_grafter@master
-      if: "!contains(matrix.arch, 'windows')"
+      if: "!contains(matrix.target, 'windows')"
       with:
         source_path: install/casadi
         destination_path: install/casadi
