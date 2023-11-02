@@ -30,7 +30,7 @@ runs:
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
         repo: 'jgillis/restricted'
-        file: 'artelys_lic_5007_casadi-dev_2022-08-24.txt'
+        file: ' artelys_lic_8325_casadi_2023-11-02.txt '
         token: ${{ inputs.token }}
     - run: tar -xzf ${{env.knitro}}.tar.gz -C $RUNNER_TEMP
       shell: bash
@@ -38,7 +38,7 @@ runs:
     - run: unzip -q ${{env.knitro}}.zip -d $RUNNER_TEMP
       shell: bash
       if: runner.os == 'Windows'
-    - run: cp artelys_lic_5007_casadi-dev_2022-08-24.txt $RUNNER_TEMP
+    - run: cp  artelys_lic_8325_casadi_2023-11-02.txt  $RUNNER_TEMP
       shell: bash
       
     # Add to PATH
@@ -67,7 +67,7 @@ runs:
     - run: echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so"
       if: runner.os != 'Windows'
       shell: bash
-    - run: echo "ARTELYS_LICENSE=$RUNNER_TEMP/artelys_lic_5007_casadi-dev_2022-08-24.txt" >> $GITHUB_ENV
+    - run: echo "ARTELYS_LICENSE=$RUNNER_TEMP/ artelys_lic_8325_casadi_2023-11-02.txt " >> $GITHUB_ENV
       shell: bash
 
     # SNOPT
