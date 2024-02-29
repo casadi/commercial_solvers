@@ -30,7 +30,7 @@ runs:
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
         repo: 'jgillis/restricted'
-        file: ' artelys_lic_8325_casadi_2023-11-02.txt '
+        file: 'artelys_lic_8325_casadi_2023-11-02.txt'
         token: ${{ inputs.token }}
     - run: tar -xzf ${{env.knitro}}.tar.gz -C $RUNNER_TEMP
       shell: bash
@@ -38,7 +38,7 @@ runs:
     - run: unzip -q ${{env.knitro}}.zip -d $RUNNER_TEMP
       shell: bash
       if: runner.os == 'Windows'
-    - run: cp  artelys_lic_8325_casadi_2023-11-02.txt  $RUNNER_TEMP
+    - run: cp artelys_lic_8325_casadi_2023-11-02.txt $RUNNER_TEMP
       shell: bash
       
     # Add to PATH
