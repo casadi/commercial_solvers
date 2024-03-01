@@ -67,7 +67,7 @@ runs:
     - run: echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so"
       if: runner.os != 'Windows'
       shell: bash
-    - run: echo "ARTELYS_LICENSE=$RUNNER_TEMP/ artelys_lic_8325_casadi_2023-11-02.txt " >> $GITHUB_ENV
+    - run: echo "ARTELYS_LICENSE=$RUNNER_TEMP/artelys_lic_8325_casadi_2023-11-02.txt" >> $GITHUB_ENV
       shell: bash
 
     # SNOPT
