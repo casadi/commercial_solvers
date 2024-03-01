@@ -84,7 +84,7 @@ runs:
         file: 'snopt7.lic'
         token: ${{ inputs.token }}
 
-    - run: cp 7.lic $RUNNER_TEMP/snopt
+    - run: cp snopt7.lic $RUNNER_TEMP/snopt
       shell: bash
 
     - run: |
