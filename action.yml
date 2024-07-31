@@ -49,6 +49,13 @@ runs:
         echo "LD_PRELOAD=$RUNNER_TEMP/${{env.knitro}}/lib/libiomp5.so" >> $GITHUB_ENV
       if: runner.os == 'Linux'
       shell: bash
+    - run: |
+        if [ ! -d "/usr/local/lib" ]; then
+          sudo mkdir -p /usr/local/lib
+          sudo chown -R $(whoami) /usr/local/lib
+        fi
+      if: runner.os == 'macOS'
+      shell: bash
       
     # cfr. https://github.com/pypa/cibuildwheel/issues/816
     - run: |
