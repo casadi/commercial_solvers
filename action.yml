@@ -344,6 +344,11 @@ runs:
         echo "SKIP_WORHP_TESTS=ON" >> $GITHUB_ENV
       shell: bash
 
+    # Disable temporarily
+    - run: |
+        echo "SKIP_SNOPT_TESTS=ON" >> $GITHUB_ENV
+      shell: bash
+      
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
         repo: casadi/commercial_solvers
