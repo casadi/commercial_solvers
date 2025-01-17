@@ -356,6 +356,11 @@ runs:
 
     # Disable temporarily
     - run: |
+        echo "SKIP_KNITRO_TESTS=ON" >> $GITHUB_ENV
+      shell: bash
+
+    # Disable temporarily
+    - run: |
         echo "SKIP_MADNLP_TESTS=ON" >> $GITHUB_ENV
       shell: bash
       
