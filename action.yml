@@ -335,7 +335,7 @@ runs:
       if: runner.os != 'macOS'
       shell: bash
 
-    - run: sudo apt install libsuperlu5 libopenblas0 -y
+    - run: sudo apt install libopenblas0 -y #  libsuperlu5 
       if: runner.os == 'linux'
       shell: bash
   
