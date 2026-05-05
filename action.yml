@@ -359,11 +359,6 @@ runs:
         echo "SKIP_KNITRO_TESTS=ON" >> $GITHUB_ENV
       shell: bash
 
-    # Disable temporarily
-    - run: |
-        echo "SKIP_MADNLP_TESTS=ON" >> $GITHUB_ENV
-      shell: bash
-      
     - uses: dsaltares/fetch-gh-release-asset@1.1.0
       with:
         repo: casadi/commercial_solvers
@@ -389,33 +384,41 @@ runs:
     # Pre-fetches the binaries that WITH_BUILD_MADNLP would otherwise pull at
     # configure time (see CMakeLists.txt:824-841 and :1379-1430). Asset names
     # mirror the per-platform branches; LIBMAD_RELEASE must track the default
-    # in CMakeLists.txt:828.
+    # in CMakeLists.txt:828. macOS-X64 has no upstream build (CMakeLists.txt
+    # only ships apple-aarch64 under if(APPLE)) → SKIP_MADNLP_TESTS=ON.
     - run: |
         case "${RUNNER_OS}-${RUNNER_ARCH}" in
-          Linux-X64)   asset="libMad-ubuntu-x86_64"  ;;
-          Windows-X64) asset="libMad-windows-x86_64" ;;
-          macOS-*)     asset="libMad-apple-aarch64"  ;;
-          *) echo "Unsupported platform for libMad: ${RUNNER_OS}-${RUNNER_ARCH}"; exit 1 ;;
+          Linux-X64)   echo "LIBMAD_ASSET=libMad-ubuntu-x86_64"  >> $GITHUB_ENV ;;
+          Windows-X64) echo "LIBMAD_ASSET=libMad-windows-x86_64" >> $GITHUB_ENV ;;
+          macOS-ARM64) echo "LIBMAD_ASSET=libMad-apple-aarch64"  >> $GITHUB_ENV ;;
         esac
-        release="v0.0.7-casadi"
+        echo "LIBMAD_RELEASE=v0.0.7-casadi" >> $GITHUB_ENV
+      shell: bash
+
+    - run: |
         mkdir -p "$RUNNER_TEMP/libMad"
         curl -fL -o "$RUNNER_TEMP/libMad/libMad.tar.gz" \
-          "https://github.com/apozharski/libMad/releases/download/${release}/${asset}-${release}.tar.gz"
+          "https://github.com/apozharski/libMad/releases/download/${LIBMAD_RELEASE}/${LIBMAD_ASSET}-${LIBMAD_RELEASE}.tar.gz"
         tar -xf "$RUNNER_TEMP/libMad/libMad.tar.gz" -C "$RUNNER_TEMP/libMad"
-        echo "LIBMAD_RELEASE=${release}" >> $GITHUB_ENV
         ls -R "$RUNNER_TEMP/libMad"
+      if: env.LIBMAD_ASSET != ''
+      shell: bash
+
+    # No libMad build for this platform → skip MadNLP tests.
+    - run: echo "SKIP_MADNLP_TESTS=ON" >> $GITHUB_ENV
+      if: env.LIBMAD_ASSET == ''
       shell: bash
 
     # Runtime discovery. Layout matches SHARED_LIBRARY_RELDIR in
     # CMakeLists.txt:1406-1407 (lib/ on Linux+macOS, bin/ on Windows).
     - run: echo "LD_LIBRARY_PATH=$RUNNER_TEMP/libMad/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-      if: runner.os == 'Linux'
+      if: env.LIBMAD_ASSET != '' && runner.os == 'Linux'
       shell: bash
     - run: sudo cp $RUNNER_TEMP/libMad/lib/* /usr/local/lib
-      if: runner.os == 'macOS'
+      if: env.LIBMAD_ASSET != '' && runner.os == 'macOS'
       shell: bash
     - run: echo "PATH=$env:RUNNER_TEMP\libMad\bin;$env:PATH" >> $env:GITHUB_ENV
-      if: runner.os == 'Windows'
+      if: env.LIBMAD_ASSET != '' && runner.os == 'Windows'
       shell: powershell
 
     # Mosek
