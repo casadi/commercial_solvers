@@ -15,10 +15,10 @@ runs:
         key: "${{runner.os}}-${{runner.arch}}"
         map: |
          {
-            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin", "gurobi": "gurobi10.0.1_linux64.tar.gz", "hsl": "hsl-manylinux2014-x64", "bqpd": "bqpd-manylinux2014-x64", "worhp": "worhp_1.15_ubuntu2004", "snopt": "libsnopt7c_linux"},
-            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cplex2211_win64", "cplex_suffix": ".zip", "gurobi": "Gurobi-10.0.1-win64.msi", "hsl": "hsl-windows-shared-x64-posix", "bqpd": "bqpd-windows-shared-x64-posix", "worhp": "worhp_1.15-0_win64", "snopt": "libsnopt7_win"},
-            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-11", "bqpd": "bqpd-macos-11", "snopt": "libsnopt7c_mac"},
-            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-m1", "bqpd": "bqpd-macos-m1", "snopt": "libsnopt7c_mac"}
+            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin", "gurobi": "gurobi10.0.1_linux64.tar.gz", "hsl": "hsl-manylinux2014-x64", "bqpd": "bqpd-manylinux2014-x64", "worhp": "worhp_1.15_ubuntu2004", "snopt": "libsnopt7c_linux", "mosek": "mosektoolslinux64x86", "mosek_suffix": ".tar.bz2", "mosek_platform": "linux64x86", "xpress": "xpress_linux"},
+            "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cplex2211_win64", "cplex_suffix": ".zip", "gurobi": "Gurobi-10.0.1-win64.msi", "hsl": "hsl-windows-shared-x64-posix", "bqpd": "bqpd-windows-shared-x64-posix", "worhp": "worhp_1.15-0_win64", "snopt": "libsnopt7_win", "mosek": "mosek", "mosek_suffix": ".zip", "mosek_platform": "win64x86"},
+            "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-11", "bqpd": "bqpd-macos-11", "snopt": "libsnopt7c_mac", "xpress": "xpress_mac_intel"},
+            "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-m1", "bqpd": "bqpd-macos-m1", "snopt": "libsnopt7c_mac", "mosek": "mosektoolsosxaarch64", "mosek_suffix": ".tar.bz2", "mosek_platform": "osxaarch64", "xpress": "xpress_mac_arm"}
          }
         export_to: env
     # Download protected release asset
@@ -383,4 +383,125 @@ runs:
 
     - run: echo "$LD_LIBRARY_PATH"
       if: runner.os == 'Linux'
+      shell: bash
+
+    # MadNLP / libMad
+    # Pre-fetches the binaries that WITH_BUILD_MADNLP would otherwise pull at
+    # configure time (see CMakeLists.txt:824-841 and :1379-1430). Asset names
+    # mirror the per-platform branches; LIBMAD_RELEASE must track the default
+    # in CMakeLists.txt:828.
+    - run: |
+        case "${RUNNER_OS}-${RUNNER_ARCH}" in
+          Linux-X64)   asset="libMad-ubuntu-x86_64"  ;;
+          Windows-X64) asset="libMad-windows-x86_64" ;;
+          macOS-*)     asset="libMad-apple-aarch64"  ;;
+          *) echo "Unsupported platform for libMad: ${RUNNER_OS}-${RUNNER_ARCH}"; exit 1 ;;
+        esac
+        release="v0.0.7-casadi"
+        mkdir -p "$RUNNER_TEMP/libMad"
+        curl -fL -o "$RUNNER_TEMP/libMad/libMad.tar.gz" \
+          "https://github.com/apozharski/libMad/releases/download/${release}/${asset}-${release}.tar.gz"
+        tar -xf "$RUNNER_TEMP/libMad/libMad.tar.gz" -C "$RUNNER_TEMP/libMad"
+        echo "LIBMAD_RELEASE=${release}" >> $GITHUB_ENV
+        ls -R "$RUNNER_TEMP/libMad"
+      shell: bash
+
+    # Runtime discovery. Layout matches SHARED_LIBRARY_RELDIR in
+    # CMakeLists.txt:1406-1407 (lib/ on Linux+macOS, bin/ on Windows).
+    - run: echo "LD_LIBRARY_PATH=$RUNNER_TEMP/libMad/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      if: runner.os == 'Linux'
+      shell: bash
+    - run: sudo cp $RUNNER_TEMP/libMad/lib/* /usr/local/lib
+      if: runner.os == 'macOS'
+      shell: bash
+    - run: echo "PATH=$env:RUNNER_TEMP\libMad\bin;$env:PATH" >> $env:GITHUB_ENV
+      if: runner.os == 'Windows'
+      shell: powershell
+
+    # Mosek
+    # Tarballs / zip + license live in the jgillis/restricted release alongside
+    # knitro et al. No mac-x64 build is shipped, so all mosek steps are gated
+    # on env.mosek (set by the variable-mapper above).
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: 'jgillis/restricted'
+        file: ${{env.mosek}}${{env.mosek_suffix}}
+        token: ${{ inputs.token }}
+      if: env.mosek != ''
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: 'jgillis/restricted'
+        file: 'mosek.lic'
+        token: ${{ inputs.token }}
+      if: env.mosek != ''
+
+    - run: |
+        mkdir -p "$RUNNER_TEMP/mosek_root"
+        tar -xf ${{env.mosek}}${{env.mosek_suffix}} -C "$RUNNER_TEMP/mosek_root"
+        # Tarball roots at mosek/<version>/...; capture the version directory name
+        echo "MOSEK_VERSION=$(ls "$RUNNER_TEMP/mosek_root/mosek")" >> $GITHUB_ENV
+        mv mosek.lic "$RUNNER_TEMP/mosek.lic"
+        echo "MOSEKLM_LICENSE_FILE=$RUNNER_TEMP/mosek.lic" >> $GITHUB_ENV
+      if: env.mosek != '' && runner.os != 'Windows'
+      shell: bash
+    - run: |
+        unzip -q ${{env.mosek}}${{env.mosek_suffix}} -d "$RUNNER_TEMP/mosek_root"
+        echo "MOSEK_VERSION=$(ls "$RUNNER_TEMP/mosek_root/mosek")" >> $GITHUB_ENV
+        mv mosek.lic "$RUNNER_TEMP/mosek.lic"
+        echo "MOSEKLM_LICENSE_FILE=$RUNNER_TEMP/mosek.lic" >> $GITHUB_ENV
+      if: env.mosek != '' && runner.os == 'Windows'
+      shell: bash
+
+    # Runtime discovery — bin/ holds both binaries and the shared lib for all
+    # platforms (libmosek64.so / libmosek64.dylib / mosek64_<ver>.dll).
+    - run: echo "LD_LIBRARY_PATH=$RUNNER_TEMP/mosek_root/mosek/${MOSEK_VERSION}/tools/platform/${{env.mosek_platform}}/bin:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      if: env.mosek != '' && runner.os == 'Linux'
+      shell: bash
+    # cfr. https://github.com/pypa/cibuildwheel/issues/816
+    - run: sudo cp $RUNNER_TEMP/mosek_root/mosek/${MOSEK_VERSION}/tools/platform/${{env.mosek_platform}}/bin/*.dylib /usr/local/lib
+      if: env.mosek != '' && runner.os == 'macOS'
+      shell: bash
+    - run: echo "PATH=$env:RUNNER_TEMP\mosek_root\mosek\$env:MOSEK_VERSION\tools\platform\${{env.mosek_platform}}\bin;$env:PATH" >> $env:GITHUB_ENV
+      if: env.mosek != '' && runner.os == 'Windows'
+      shell: powershell
+
+    # No mosek build for this platform (e.g. macOS-X64) → tell the test suite to skip.
+    - run: echo "SKIP_MOSEK_TESTS=ON" >> $GITHUB_ENV
+      if: env.mosek == ''
+      shell: bash
+
+    # Xpress
+    # Self-contained zips (bin/ + lib/ at archive root); license is bundled as
+    # bin/xpauth.xpr — no separate .lic. Only Linux + both macOS arches ship;
+    # gated on env.xpress.
+    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+      with:
+        repo: 'jgillis/restricted'
+        file: ${{env.xpress}}.zip
+        token: ${{ inputs.token }}
+      if: env.xpress != ''
+    - run: |
+        mkdir -p "$RUNNER_TEMP/xpress"
+        unzip -q ${{env.xpress}}.zip -d "$RUNNER_TEMP/xpress"
+        # XPRESS points at the install root so libxprs locates bin/xpauth.xpr
+        echo "XPRESS=$RUNNER_TEMP/xpress" >> $GITHUB_ENV
+        ls "$RUNNER_TEMP/xpress/lib"
+      if: env.xpress != ''
+      shell: bash
+
+    - run: echo "LD_LIBRARY_PATH=$RUNNER_TEMP/xpress/lib:$RUNNER_TEMP/xpress/lib/thirdparty:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      if: env.xpress != '' && runner.os == 'Linux'
+      shell: bash
+    # cfr. https://github.com/pypa/cibuildwheel/issues/816
+    - run: |
+        sudo cp $RUNNER_TEMP/xpress/lib/*.dylib /usr/local/lib
+        if [ -d "$RUNNER_TEMP/xpress/lib/thirdparty" ]; then
+          sudo cp $RUNNER_TEMP/xpress/lib/thirdparty/*.dylib /usr/local/lib 2>/dev/null || true
+        fi
+      if: env.xpress != '' && runner.os == 'macOS'
+      shell: bash
+
+    # No xpress build for this platform (e.g. Windows-X64) → tell the test suite to skip.
+    - run: echo "SKIP_XPRESS_TESTS=ON" >> $GITHUB_ENV
+      if: env.xpress == ''
       shell: bash
