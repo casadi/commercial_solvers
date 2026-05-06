@@ -393,6 +393,9 @@ runs:
           macOS-ARM64) echo "LIBMAD_ASSET=libMad-apple-aarch64"  >> $GITHUB_ENV ;;
         esac
         echo "LIBMAD_RELEASE=v0.0.7-casadi" >> $GITHUB_ENV
+        # Embedded Julia (in libMad) probes /usr/local/cuda/compat on Linux
+        # and can stall / fail on CI runners without a real CUDA driver.
+        echo "JULIA_CUDA_USE_COMPAT=false" >> $GITHUB_ENV
       shell: bash
 
     - run: |
