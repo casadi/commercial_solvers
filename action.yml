@@ -460,22 +460,19 @@ runs:
       shell: bash
     - run: |
         unzip -q ${{env.mosek}}${{env.mosek_suffix}} -d "$RUNNER_TEMP/mosek_root"
-        echo "MOSEK_VERSION=$(ls "$RUNNER_TEMP/mosek_root/mosek")" >> $GITHUB_ENV
+        # Mosek's Windows install lays out mosek/<dir-version>/...; the DLL
+        # inside is mosek64_<dll-suffix>.dll.  The two strings differ in
+        # separator (e.g. dir 11.1 vs DLL suffix 11_1).  Capture both:
+        # MOSEK_VERSION_DIR drives path construction below, MOSEK_VERSION
+        # is read by the mosek mockup adaptor on Windows to form the
+        # mosek64_${MOSEK_VERSION}.dll filename it LoadLibrarys.
+        mosek_dir=$(ls "$RUNNER_TEMP/mosek_root/mosek")
+        echo "MOSEK_VERSION_DIR=$mosek_dir" >> $GITHUB_ENV
+        echo "MOSEK_VERSION=${mosek_dir//./_}" >> $GITHUB_ENV
         mv mosek.lic "$RUNNER_TEMP/mosek.lic"
         echo "MOSEKLM_LICENSE_FILE=$RUNNER_TEMP/mosek.lic" >> $GITHUB_ENV
       if: env.mosek != '' && runner.os == 'Windows'
       shell: bash
-
-    # Windows ships only versioned names (mosek64_<ver>.dll / .lib); Linux and
-    # macOS tarballs already include unversioned symlinks. Drop unversioned
-    # copies next to the versioned files for build systems that link `mosek64`.
-    - run: |
-        $bin = "$env:RUNNER_TEMP\mosek_root\mosek\$env:MOSEK_VERSION\tools\platform\${{env.mosek_platform}}\bin"
-        Get-ChildItem -Path $bin -Filter 'mosek64_*.dll' | Select-Object -First 1 | ForEach-Object { Copy-Item $_.FullName (Join-Path $bin 'mosek64.dll') -Force }
-        Get-ChildItem -Path $bin -Filter 'mosek64_*.lib' | Select-Object -First 1 | ForEach-Object { Copy-Item $_.FullName (Join-Path $bin 'mosek64.lib') -Force }
-        Get-ChildItem $bin
-      if: env.mosek != '' && runner.os == 'Windows'
-      shell: powershell
 
     # Runtime discovery — bin/ holds both binaries and the shared lib for all
     # platforms (libmosek64.so / libmosek64.dylib / mosek64_<ver>.dll).
@@ -486,7 +483,7 @@ runs:
     - run: sudo cp $RUNNER_TEMP/mosek_root/mosek/${MOSEK_VERSION}/tools/platform/${{env.mosek_platform}}/bin/*.dylib /usr/local/lib
       if: env.mosek != '' && runner.os == 'macOS'
       shell: bash
-    - run: echo "PATH=$env:RUNNER_TEMP\mosek_root\mosek\$env:MOSEK_VERSION\tools\platform\${{env.mosek_platform}}\bin;$env:PATH" >> $env:GITHUB_ENV
+    - run: echo "PATH=$env:RUNNER_TEMP\mosek_root\mosek\$env:MOSEK_VERSION_DIR\tools\platform\${{env.mosek_platform}}\bin;$env:PATH" >> $env:GITHUB_ENV
       if: env.mosek != '' && runner.os == 'Windows'
       shell: powershell
 
