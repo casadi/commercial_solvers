@@ -507,8 +507,10 @@ runs:
     - run: |
         mkdir -p "$RUNNER_TEMP/xpress"
         unzip -q ${{env.xpress}}.zip -d "$RUNNER_TEMP/xpress"
-        # XPRESS points at the install root so libxprs locates bin/xpauth.xpr
-        echo "XPRESS=$RUNNER_TEMP/xpress" >> $GITHUB_ENV
+        # XPRESSDIR is the install root; XPRESS must point at the bin/
+        # subdir that holds xpauth.xpr (matches FICO's xpvars.sh).
+        echo "XPRESSDIR=$RUNNER_TEMP/xpress" >> $GITHUB_ENV
+        echo "XPRESS=$RUNNER_TEMP/xpress/bin" >> $GITHUB_ENV
         ls "$RUNNER_TEMP/xpress/lib"
       if: env.xpress != ''
       shell: bash
