@@ -414,7 +414,10 @@ runs:
     - run: echo "LD_LIBRARY_PATH=$RUNNER_TEMP/libMad/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
       if: env.LIBMAD_ASSET != '' && runner.os == 'Linux'
       shell: bash
-    - run: sudo cp $RUNNER_TEMP/libMad/lib/* /usr/local/lib
+    # Recursive copy preserves the lib/julia/ subdir that libjulia.dylib
+    # locates via RPATH @loader_path/julia. Plain `cp` errors on the
+    # directory entry; flattening would also break RPATH resolution.
+    - run: sudo cp -R $RUNNER_TEMP/libMad/lib/ /usr/local/lib/
       if: env.LIBMAD_ASSET != '' && runner.os == 'macOS'
       shell: bash
     - run: echo "PATH=$env:RUNNER_TEMP\libMad\bin;$env:PATH" >> $env:GITHUB_ENV
