@@ -412,6 +412,11 @@ runs:
           tar -xf "$RUNNER_TEMP/libMad/libMad.tar.gz" -C "$RUNNER_TEMP/libMad"
         fi
         ls -R "$RUNNER_TEMP/libMad"
+        # LIBMADDIR points to the extracted install root (parent of lib/ |
+        # bin/ | include/).  No upstream env-var convention exists; this is
+        # an internal-only export for downstream build scripts that want a
+        # single handle on the pre-fetched libMad.
+        echo "LIBMADDIR=$RUNNER_TEMP/libMad" >> $GITHUB_ENV
       if: env.LIBMAD_ASSET != ''
       shell: bash
 
@@ -495,6 +500,18 @@ runs:
       if: env.mosek != '' && runner.os == 'macOS'
       shell: bash
     - run: echo "PATH=$env:RUNNER_TEMP\mosek_root\mosek\$env:MOSEK_VERSION_DIR\tools\platform\${{env.mosek_platform}}\bin;$env:PATH" >> $env:GITHUB_ENV
+      if: env.mosek != '' && runner.os == 'Windows'
+      shell: powershell
+
+    # Windows ships only the versioned import library (mosek64_<ver>.lib).
+    # The runtime DLL is resolved by the mockup adaptor via $MOSEK_VERSION,
+    # but link-time consumers expect an unversioned mosek64.lib — drop a
+    # copy next to the versioned file.  (The matching .dll alias is NOT
+    # needed: the adaptor does that indirection at runtime.)
+    - run: |
+        $bin = "$env:RUNNER_TEMP\mosek_root\mosek\$env:MOSEK_VERSION_DIR\tools\platform\${{env.mosek_platform}}\bin"
+        Get-ChildItem -Path $bin -Filter 'mosek64_*.lib' | Select-Object -First 1 | ForEach-Object { Copy-Item $_.FullName (Join-Path $bin 'mosek64.lib') -Force }
+        Get-ChildItem $bin
       if: env.mosek != '' && runner.os == 'Windows'
       shell: powershell
 
