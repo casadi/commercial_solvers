@@ -411,6 +411,17 @@ runs:
         else
           tar -xf "$RUNNER_TEMP/libMad/libMad.tar.gz" -C "$RUNNER_TEMP/libMad"
         fi
+        # Windows ships the import library as libMad.imp.lib; drop a
+        # libMad.lib alias next to it for link-time consumers that expect
+        # the conventional MSVC name.  Look in bin/ (SHARED_LIBRARY_RELDIR
+        # on Windows) and lib/ since older layouts placed it there.
+        if [ "$RUNNER_OS" = "Windows" ]; then
+          for d in "$RUNNER_TEMP/libMad/bin" "$RUNNER_TEMP/libMad/lib"; do
+            if [ -f "$d/libMad.imp.lib" ]; then
+              cp "$d/libMad.imp.lib" "$d/libMad.lib"
+            fi
+          done
+        fi
         ls -R "$RUNNER_TEMP/libMad"
         # LIBMADDIR points to the extracted install root (parent of lib/ |
         # bin/ | include/).  No upstream env-var convention exists; this is
