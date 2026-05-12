@@ -458,7 +458,11 @@ runs:
         # Tarball roots at mosek/<version>/...; capture the version directory name
         # for path construction.  MOSEK_VERSION itself is unused on Linux/Mac
         # (only Windows needs it, where the mosek adaptor reads it as a DLL suffix).
-        echo "MOSEK_VERSION_DIR=$(ls "$RUNNER_TEMP/mosek_root/mosek")" >> $GITHUB_ENV
+        mosek_dir=$(ls "$RUNNER_TEMP/mosek_root/mosek")
+        echo "MOSEK_VERSION_DIR=$mosek_dir" >> $GITHUB_ENV
+        # MOSEKDIR is Mosek's conventional install root (parent of bin/), used
+        # by CMake's find logic and by downstream build scripts.
+        echo "MOSEKDIR=$RUNNER_TEMP/mosek_root/mosek/$mosek_dir/tools/platform/${{env.mosek_platform}}" >> $GITHUB_ENV
         mv mosek.lic "$RUNNER_TEMP/mosek.lic"
         echo "MOSEKLM_LICENSE_FILE=$RUNNER_TEMP/mosek.lic" >> $GITHUB_ENV
       if: env.mosek != '' && runner.os != 'Windows'
@@ -474,6 +478,8 @@ runs:
         mosek_dir=$(ls "$RUNNER_TEMP/mosek_root/mosek")
         echo "MOSEK_VERSION_DIR=$mosek_dir" >> $GITHUB_ENV
         echo "MOSEK_VERSION=${mosek_dir//./_}" >> $GITHUB_ENV
+        # MOSEKDIR is Mosek's conventional install root (parent of bin/).
+        echo "MOSEKDIR=$RUNNER_TEMP/mosek_root/mosek/$mosek_dir/tools/platform/${{env.mosek_platform}}" >> $GITHUB_ENV
         mv mosek.lic "$RUNNER_TEMP/mosek.lic"
         echo "MOSEKLM_LICENSE_FILE=$RUNNER_TEMP/mosek.lic" >> $GITHUB_ENV
       if: env.mosek != '' && runner.os == 'Windows'
