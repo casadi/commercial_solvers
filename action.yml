@@ -445,7 +445,15 @@ runs:
     # Recursive copy preserves the lib/julia/ subdir that libjulia.dylib
     # locates via RPATH @loader_path/julia. Plain `cp` errors on the
     # directory entry; flattening would also break RPATH resolution.
-    - run: sudo cp -R $RUNNER_TEMP/libMad/lib/ /usr/local/lib/
+    # The macOS libMad tarball also ships share/julia/artifacts/<hash>/lib/
+    # that libjulia reaches via @loader_path/../share/...; copy the share/
+    # tree alongside so RPATH-relative resolution keeps working from
+    # /usr/local/lib/. Linux tarball has no share/ — guard the copy.
+    - run: |
+        sudo cp -R $RUNNER_TEMP/libMad/lib/ /usr/local/lib/
+        if [ -d "$RUNNER_TEMP/libMad/share" ]; then
+          sudo cp -R "$RUNNER_TEMP/libMad/share/" /usr/local/share/
+        fi
       if: env.LIBMAD_ASSET != '' && runner.os == 'macOS'
       shell: bash
     - run: echo "PATH=$env:RUNNER_TEMP\libMad\bin;$env:PATH" >> $env:GITHUB_ENV
