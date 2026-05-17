@@ -464,13 +464,13 @@ runs:
     # Tarballs / zip + license live in the jgillis/restricted release alongside
     # knitro et al. No mac-x64 build is shipped, so all mosek steps are gated
     # on env.mosek (set by the variable-mapper above).
-    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+    - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
       with:
         repo: 'jgillis/restricted'
         file: ${{env.mosek}}${{env.mosek_suffix}}
         token: ${{ inputs.token }}
       if: env.mosek != ''
-    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+    - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
       with:
         repo: 'jgillis/restricted'
         file: 'mosek.lic'
@@ -544,7 +544,7 @@ runs:
     # Self-contained zips (bin/ + lib/ at archive root); license is bundled as
     # bin/xpauth.xpr — no separate .lic. Only Linux + both macOS arches ship;
     # gated on env.xpress.
-    - uses: dsaltares/fetch-gh-release-asset@1.1.0
+    - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
       with:
         repo: 'jgillis/restricted'
         file: ${{env.xpress}}.zip
