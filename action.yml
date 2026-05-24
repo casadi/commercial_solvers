@@ -433,7 +433,7 @@ runs:
       shell: bash
 
     # No libMad build for this platform → skip MadNLP tests.
-    - run: echo "SKIP_MADNLP_TESTS=ON" >> $GITHUB_ENV
+    - run: echo "SKIP_MADNLP_TESTS=ON" >> $GITHUB_ENV && echo "SKIP_CCOPT_TESTS=ON" >> $GITHUB_ENV
       if: env.LIBMAD_ASSET == ''
       shell: bash
 
