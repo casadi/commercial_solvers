@@ -583,7 +583,7 @@ runs:
     # builds the plugin against the mockup; the real lib is supplied here at test time).
     # No token needed; mapped for Linux-X64, Windows-X64 and macOS-ARM64.
     - run: |
-        curl -fL -o "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" \
+        env -u LD_LIBRARY_PATH -u DYLD_LIBRARY_PATH curl -fL -o "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" \
           "https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/${{env.onnxruntime}}.${{env.onnxruntime_ext}}"
         tar -xzf "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" -C "$RUNNER_TEMP"
         ls "$RUNNER_TEMP/${{env.onnxruntime}}/lib"
@@ -591,7 +591,7 @@ runs:
       if: env.onnxruntime != '' && runner.os == 'Linux'
       shell: bash
     - run: |
-        curl -fL -o "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" \
+        env -u LD_LIBRARY_PATH -u DYLD_LIBRARY_PATH curl -fL -o "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" \
           "https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/${{env.onnxruntime}}.${{env.onnxruntime_ext}}"
         tar -xzf "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" -C "$RUNNER_TEMP"
         ls "$RUNNER_TEMP/${{env.onnxruntime}}/lib"
@@ -600,7 +600,7 @@ runs:
       if: env.onnxruntime != '' && runner.os == 'macOS'
       shell: bash
     - run: |
-        curl -fL -o "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" \
+        env -u LD_LIBRARY_PATH -u DYLD_LIBRARY_PATH curl -fL -o "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" \
           "https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/${{env.onnxruntime}}.${{env.onnxruntime_ext}}"
         unzip -q "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" -d "$RUNNER_TEMP"
         ls "$RUNNER_TEMP/${{env.onnxruntime}}/lib"
