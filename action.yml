@@ -15,7 +15,7 @@ runs:
         key: "${{runner.os}}-${{runner.arch}}"
         map: |
          {
-            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin", "gurobi": "gurobi10.0.1_linux64.tar.gz", "hsl": "hsl-manylinux2014-x64", "bqpd": "bqpd-manylinux2014-x64", "worhp": "worhp_1.15_ubuntu2004", "snopt": "libsnopt7c_linux", "mosek": "mosektoolslinux64x86", "mosek_suffix": ".tar.bz2", "mosek_platform": "linux64x86", "xpress": "xpress_linux"},
+            "Linux-X64": {"knitro": "knitro-13.2.0-Linux-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SWML-linux-x86-64", "cplex_suffix": ".bin", "gurobi": "gurobi10.0.1_linux64.tar.gz", "hsl": "hsl-manylinux2014-x64", "bqpd": "bqpd-manylinux2014-x64", "worhp": "worhp_1.15_ubuntu2004", "snopt": "libsnopt7c_linux", "mosek": "mosektoolslinux64x86", "mosek_suffix": ".tar.bz2", "mosek_platform": "linux64x86", "xpress": "xpress_linux", "onnxruntime": "onnxruntime-linux-x64-1.22.0", "onnxruntime_ext": "tgz"},
             "Windows-X64": {"knitro": "knitro-13.2.0-Win64", "knitro_suffix": ".zip", "cplex": "cplex2211_win64", "cplex_suffix": ".zip", "gurobi": "Gurobi-10.0.1-win64.msi", "hsl": "hsl-windows-shared-x64-posix", "bqpd": "bqpd-windows-shared-x64-posix", "worhp": "worhp_1.15-0_win64", "snopt": "libsnopt7_win", "mosek": "mosek", "mosek_suffix": ".zip", "mosek_platform": "win64x86"},
             "macOS-X64": {"knitro": "knitro-13.2.0-MacOS-64", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08SXML-osx", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-11", "bqpd": "bqpd-macos-11", "snopt": "libsnopt7c_mac", "xpress": "xpress_mac_intel"},
             "macOS-ARM64": {"knitro": "knitro-13.2.0-MacOS-ARM", "knitro_suffix": ".tar.gz", "cplex": "cos_installer_preview-22.1.1.0.R0-M08WYML-osx-arm64", "cplex_suffix": ".zip", "gurobi": "gurobi10.0.1_macos_universal2.pkg", "hsl": "hsl-macos-m1", "bqpd": "bqpd-macos-m1", "snopt": "libsnopt7c_mac", "mosek": "mosektoolsosxaarch64", "mosek_suffix": ".tar.bz2", "mosek_platform": "osxaarch64", "xpress": "xpress_mac_arm"}
@@ -576,4 +576,17 @@ runs:
     # No xpress build for this platform (e.g. Windows-X64) → tell the test suite to skip.
     - run: echo "SKIP_XPRESS_TESTS=ON" >> $GITHUB_ENV
       if: env.xpress == ''
+      shell: bash
+
+    # ONNX Runtime (public, MIT). Provide the real runtime so the linux wheels'
+    # onnxruntime plugin runs against it instead of the bundled mockup (manylinux2014)
+    # or its own copy. No token needed; only mapped for Linux-X64 (the only platform
+    # that builds the plugin).
+    - run: |
+        curl -fL -o "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" \
+          "https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/${{env.onnxruntime}}.${{env.onnxruntime_ext}}"
+        tar -xzf "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" -C "$RUNNER_TEMP"
+        ls "$RUNNER_TEMP/${{env.onnxruntime}}/lib"
+        echo "LD_LIBRARY_PATH=$RUNNER_TEMP/${{env.onnxruntime}}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      if: env.onnxruntime != '' && runner.os == 'Linux'
       shell: bash
