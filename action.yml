@@ -491,7 +491,12 @@ runs:
 
     - run: |
         mkdir -p "$RUNNER_TEMP/clarabel"
-        curl -fL -o "$RUNNER_TEMP/clarabel/clarabel.tar.gz" \
+        # Earlier solver setups put their lib dirs (incl. libMad/lib, which ships
+        # its own libcurl) on LD_LIBRARY_PATH; running curl now would pick up that
+        # libcurl and fail with "error setting certificate file" (exit 77). Run
+        # curl with a clean lib path.
+        env -u LD_LIBRARY_PATH -u DYLD_LIBRARY_PATH \
+          curl -fL -o "$RUNNER_TEMP/clarabel/clarabel.tar.gz" \
           "https://github.com/casadi/polyglot/releases/download/evergreen/${CLARABEL_ASSET}.tar.gz"
         tar -xf "$RUNNER_TEMP/clarabel/clarabel.tar.gz" -C "$RUNNER_TEMP/clarabel"
         ls -R "$RUNNER_TEMP/clarabel" | head -40
