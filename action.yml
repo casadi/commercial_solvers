@@ -386,17 +386,29 @@ runs:
 
     # MadNLP / libMad
     # Pre-fetches the binaries that WITH_BUILD_MADNLP would otherwise pull at
-    # configure time (see CMakeLists.txt:824-841 and :1379-1430). Asset names
-    # mirror the per-platform branches; LIBMAD_RELEASE must track the default
-    # in CMakeLists.txt:828. macOS-X64 has no upstream build (CMakeLists.txt
-    # only ships apple-aarch64 under if(APPLE)) → SKIP_MADNLP_TESTS=ON.
+    # configure time (see CMakeLists.txt:824-841 and :1379-1430). LIBMAD_URL is
+    # the full per-platform download URL; LIBMAD_ASSET stays as the non-empty
+    # "this platform is supported" marker the steps below gate on. macOS-X64 has
+    # no build (CMakeLists.txt only ships apple-aarch64 under if(APPLE)) →
+    # SKIP_MADNLP_TESTS=ON.
+    #
+    # Linux-X64 comes from casadi/polyglot's rolling `evergreen` release: a
+    # libMad built in our controlled manylinux_2_28 container that bundles its
+    # own libgomp/libjulia. This replaces the third-party apozharski build that
+    # segfaulted during embedded-Julia init (libgomp mismatch). Windows/macOS
+    # have no polyglot build yet → still apozharski v0.0.7-casadi.
     - run: |
         case "${RUNNER_OS}-${RUNNER_ARCH}" in
-          Linux-X64)   echo "LIBMAD_ASSET=libMad-ubuntu-x86_64"  >> $GITHUB_ENV ;;
-          Windows-X64) echo "LIBMAD_ASSET=libMad-windows-x86_64" >> $GITHUB_ENV ;;
-          macOS-ARM64) echo "LIBMAD_ASSET=libMad-apple-aarch64"  >> $GITHUB_ENV ;;
+          Linux-X64)
+            echo "LIBMAD_ASSET=libMad-x64" >> $GITHUB_ENV
+            echo "LIBMAD_URL=https://github.com/casadi/polyglot/releases/download/evergreen/libMad-x64.tar.gz" >> $GITHUB_ENV ;;
+          Windows-X64)
+            echo "LIBMAD_ASSET=libMad-windows-x86_64" >> $GITHUB_ENV
+            echo "LIBMAD_URL=https://github.com/apozharski/libMad/releases/download/v0.0.7-casadi/libMad-windows-x86_64-v0.0.7-casadi.tar.gz" >> $GITHUB_ENV ;;
+          macOS-ARM64)
+            echo "LIBMAD_ASSET=libMad-apple-aarch64" >> $GITHUB_ENV
+            echo "LIBMAD_URL=https://github.com/apozharski/libMad/releases/download/v0.0.7-casadi/libMad-apple-aarch64-v0.0.7-casadi.tar.gz" >> $GITHUB_ENV ;;
         esac
-        echo "LIBMAD_RELEASE=v0.0.7-casadi" >> $GITHUB_ENV
         # Embedded Julia (in libMad) probes /usr/local/cuda/compat on Linux
         # and can stall / fail on CI runners without a real CUDA driver.
         echo "JULIA_CUDA_USE_COMPAT=false" >> $GITHUB_ENV
@@ -404,8 +416,7 @@ runs:
 
     - run: |
         mkdir -p "$RUNNER_TEMP/libMad"
-        curl -fL -o "$RUNNER_TEMP/libMad/libMad.tar.gz" \
-          "https://github.com/apozharski/libMad/releases/download/${LIBMAD_RELEASE}/${LIBMAD_ASSET}-${LIBMAD_RELEASE}.tar.gz"
+        curl -fL -o "$RUNNER_TEMP/libMad/libMad.tar.gz" "$LIBMAD_URL"
         # GNU tar on Windows treats `D:\…` paths passed to -f / -C as a
         # host:path for an rmt remote tape device, and even with
         # --force-local the mixed-separator form fails on -C. Sidestep
