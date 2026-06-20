@@ -475,6 +475,34 @@ runs:
       if: env.LIBMAD_ASSET != '' && runner.os == 'Windows'
       shell: powershell
 
+    # Clarabel (real, from casadi/polyglot evergreen)
+    # CasADi binaries build the clarabel plugin against the mockup
+    # (WITH_MOCKUP_CLARABEL); here we drop the REAL libclarabel_c on
+    # LD_LIBRARY_PATH so it shadows the shipped mockup at test time (same
+    # SONAME libclarabel_c.so) -- the same mockup-build + real-at-test pattern
+    # as libMad/onnxruntime. Only Linux x64/aarch64 have a polyglot build;
+    # other OSes keep the (non-solving) mockup.
+    - run: |
+        case "${RUNNER_OS}-${RUNNER_ARCH}" in
+          Linux-X64)   echo "CLARABEL_ASSET=clarabel-x64"     >> $GITHUB_ENV ;;
+          Linux-ARM64) echo "CLARABEL_ASSET=clarabel-aarch64" >> $GITHUB_ENV ;;
+        esac
+      shell: bash
+
+    - run: |
+        mkdir -p "$RUNNER_TEMP/clarabel"
+        curl -fL -o "$RUNNER_TEMP/clarabel/clarabel.tar.gz" \
+          "https://github.com/casadi/polyglot/releases/download/evergreen/${CLARABEL_ASSET}.tar.gz"
+        tar -xf "$RUNNER_TEMP/clarabel/clarabel.tar.gz" -C "$RUNNER_TEMP/clarabel"
+        ls -R "$RUNNER_TEMP/clarabel" | head -40
+        echo "CLARABELDIR=$RUNNER_TEMP/clarabel" >> $GITHUB_ENV
+      if: env.CLARABEL_ASSET != ''
+      shell: bash
+
+    - run: echo "LD_LIBRARY_PATH=$RUNNER_TEMP/clarabel/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      if: env.CLARABEL_ASSET != '' && runner.os == 'Linux'
+      shell: bash
+
     # Mosek
     # Tarballs / zip + license live in the jgillis/restricted release alongside
     # knitro et al. No mac-x64 build is shipped, so all mosek steps are gated
