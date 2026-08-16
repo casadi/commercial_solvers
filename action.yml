@@ -623,7 +623,7 @@ runs:
 
     # No xpress build for this platform (e.g. Windows-X64) → tell the test suite to skip.
     - run: echo "SKIP_XPRESS_TESTS=ON" >> $GITHUB_ENV
-      if: env.xpress == ''
+      #if: env.xpress == ''
       shell: bash
 
     # ONNX Runtime (public, MIT). Provide the real runtime so the shipped wheels'
