@@ -348,6 +348,11 @@ runs:
         echo "SKIP_WORHP_TESTS=ON" >> $GITHUB_ENV
       shell: bash
 
+    # no ipmc binaries
+    - run: |
+        echo "SKIP_IPMC_TESTS=ON" >> $GITHUB_ENV
+      shell: bash
+
     # Disable temporarily
     - run: |
         echo "SKIP_SNOPT_TESTS=ON" >> $GITHUB_ENV
