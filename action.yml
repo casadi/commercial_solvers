@@ -537,7 +537,10 @@ runs:
 
     - run: |
         unzip -q "conopt-4_39_2-$CONOPT_PLATFORM.zip" -d "$RUNNER_TEMP"
-        ls -R "$RUNNER_TEMP/conopt-$CONOPT_PLATFORM" | head -40
+        # Plain, non-recursive ls: the archive ships a large examples/ tree, and
+        # `ls -R | head` makes ls die of EPIPE, which -o pipefail turns into a
+        # failed step. lib/ is the only part that matters here anyway.
+        ls "$RUNNER_TEMP/conopt-$CONOPT_PLATFORM" "$RUNNER_TEMP/conopt-$CONOPT_PLATFORM/lib"
         # No upstream env-var convention; CONOPT is what cmake/FindCONOPT.cmake reads.
         echo "CONOPT=$RUNNER_TEMP/conopt-$CONOPT_PLATFORM" >> $GITHUB_ENV
       if: env.CONOPT_PLATFORM != ''
