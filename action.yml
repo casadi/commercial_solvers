@@ -513,6 +513,59 @@ runs:
       if: env.CLARABEL_ASSET != '' && runner.os == 'Linux'
       shell: bash
 
+    # CONOPT (real, from the jgillis/restricted perpetual release)
+    # CasADi binaries build the conopt plugin against the mockup
+    # (WITH_MOCKUP_CONOPT); here we drop the REAL libconopt on the loader path
+    # so it shadows the shipped stub at test time (same SONAME libconopt.so.4 /
+    # install name libconopt.4.dylib / conopt4.dll).
+    - run: |
+        case "${RUNNER_OS}-${RUNNER_ARCH}" in
+          Linux-X64)    echo "CONOPT_PLATFORM=linux-x86_64" >> $GITHUB_ENV ;;
+          Linux-ARM64)  echo "CONOPT_PLATFORM=linux-arm64"  >> $GITHUB_ENV ;;
+          macOS-X64)    echo "CONOPT_PLATFORM=macos-x86_64" >> $GITHUB_ENV ;;
+          macOS-ARM64)  echo "CONOPT_PLATFORM=macos-arm64"  >> $GITHUB_ENV ;;
+          Windows-X64)  echo "CONOPT_PLATFORM=win-x86_64"   >> $GITHUB_ENV ;;
+        esac
+      shell: bash
+
+    - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
+      with:
+        repo: 'jgillis/restricted'
+        file: conopt-4_39_2-${{ env.CONOPT_PLATFORM }}.zip
+        token: ${{ inputs.token }}
+      if: env.CONOPT_PLATFORM != ''
+
+    - run: |
+        unzip -q "conopt-4_39_2-$CONOPT_PLATFORM.zip" -d "$RUNNER_TEMP"
+        ls -R "$RUNNER_TEMP/conopt-$CONOPT_PLATFORM" | head -40
+        # No upstream env-var convention; CONOPT is what cmake/FindCONOPT.cmake reads.
+        echo "CONOPT=$RUNNER_TEMP/conopt-$CONOPT_PLATFORM" >> $GITHUB_ENV
+      if: env.CONOPT_PLATFORM != ''
+      shell: bash
+
+    # Appended, not prepended: conopt's lib/ also carries its own libstdc++,
+    # libgomp, libgfortran and libgcc_s, and nothing else here provides
+    # libconopt.so.4, so earlier solvers keep the runtime they were built for.
+    - run: echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RUNNER_TEMP/conopt-$CONOPT_PLATFORM/lib" >> $GITHUB_ENV
+      if: env.CONOPT_PLATFORM != '' && runner.os == 'Linux'
+      shell: bash
+    # macOS strips DYLD_LIBRARY_PATH across the SIP-protected shells that launch
+    # the tests, so the plain-name LC_LOAD_DYLIB has to resolve via /usr/local/lib
+    # (the knitro/snopt pattern). -n keeps earlier solvers' gcc runtime in place;
+    # libconopt reaches its own libgfortran/libgomp/libquadmath via @loader_path,
+    # which is /usr/local/lib once copied.
+    - run: sudo cp -n $RUNNER_TEMP/conopt-$CONOPT_PLATFORM/lib/*.dylib /usr/local/lib
+      if: env.CONOPT_PLATFORM != '' && runner.os == 'macOS'
+      shell: bash
+    - run: echo "PATH=$env:RUNNER_TEMP\conopt-$env:CONOPT_PLATFORM\lib;$env:PATH" >> $env:GITHUB_ENV
+      if: env.CONOPT_PLATFORM != '' && runner.os == 'Windows'
+      shell: powershell
+
+    # No CONOPT build for this platform -> the shipped mockup can't solve.
+    - run: echo "SKIP_CONOPT_TESTS=ON" >> $GITHUB_ENV
+      if: env.CONOPT_PLATFORM == ''
+      shell: bash
+
     # Mosek
     # Tarballs / zip + license live in the jgillis/restricted release alongside
     # knitro et al. No mac-x64 build is shipped, so all mosek steps are gated
