@@ -5,7 +5,7 @@ inputs:
     description: GitHub token with access to the private repo
     required: true
   skip_onnxruntime:
-    description: Skip the ONNX Runtime download (python builds get it from pip onnxruntime instead)
+    description: Skip the ONNX Runtime download (leaves CASADI_ONNXRUNTIME_LIB unset, so the onnxruntime plugin stays unavailable)
     required: false
     default: 'false'
 
@@ -687,16 +687,15 @@ runs:
       #if: env.xpress == ''
       shell: bash
 
-    # ONNX Runtime (public, MIT). Provide the real runtime so the shipped wheels'
-    # onnxruntime plugin runs against it instead of the bundled mockup. Skipped for python
-    # builds (skip_onnxruntime=true): there the plugin reuses the pip `onnxruntime` lib
-    # in-process (matching soname). Kept for matlab/octave, which have no pip onnxruntime.
+    # ONNX Runtime (public, MIT). CasADi ships an adaptor rather than a runtime; it opens
+    # whatever CASADI_ONNXRUNTIME_LIB names. That is a full path on purpose: nothing gets
+    # picked up by name, least of all the ancient onnxruntime.dll in Windows' System32.
     - run: |
         env -u LD_LIBRARY_PATH -u DYLD_LIBRARY_PATH curl -fL -o "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" \
           "https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/${{env.onnxruntime}}.${{env.onnxruntime_ext}}"
         tar -xzf "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" -C "$RUNNER_TEMP"
         ls "$RUNNER_TEMP/${{env.onnxruntime}}/lib"
-        echo "LD_LIBRARY_PATH=$RUNNER_TEMP/${{env.onnxruntime}}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "CASADI_ONNXRUNTIME_LIB=$RUNNER_TEMP/${{env.onnxruntime}}/lib/libonnxruntime.so" >> $GITHUB_ENV
       if: env.onnxruntime != '' && runner.os == 'Linux' && inputs.skip_onnxruntime != 'true'
       shell: bash
     - run: |
@@ -704,9 +703,7 @@ runs:
           "https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/${{env.onnxruntime}}.${{env.onnxruntime_ext}}"
         tar -xzf "$RUNNER_TEMP/${{env.onnxruntime}}.${{env.onnxruntime_ext}}" -C "$RUNNER_TEMP"
         ls "$RUNNER_TEMP/${{env.onnxruntime}}/lib"
-        if [ ! -d "/usr/local/lib" ]; then sudo mkdir -p /usr/local/lib && sudo chown -R $(whoami) /usr/local/lib; fi
-        # *.dylib (not *.dylib*) avoids the libonnxruntime.*.dylib.dSYM debug DIRECTORY
-        sudo cp "$RUNNER_TEMP/${{env.onnxruntime}}/lib/"*.dylib /usr/local/lib
+        echo "CASADI_ONNXRUNTIME_LIB=$RUNNER_TEMP/${{env.onnxruntime}}/lib/libonnxruntime.dylib" >> $GITHUB_ENV
       if: env.onnxruntime != '' && runner.os == 'macOS' && inputs.skip_onnxruntime != 'true'
       shell: bash
     - run: |
@@ -716,6 +713,6 @@ runs:
         ls "$RUNNER_TEMP/${{env.onnxruntime}}/lib"
       if: env.onnxruntime != '' && runner.os == 'Windows' && inputs.skip_onnxruntime != 'true'
       shell: bash
-    - run: echo "PATH=$env:RUNNER_TEMP\${{env.onnxruntime}}\lib;$env:PATH" >> $env:GITHUB_ENV
+    - run: echo "CASADI_ONNXRUNTIME_LIB=$env:RUNNER_TEMP\${{env.onnxruntime}}\lib\onnxruntime.dll" >> $env:GITHUB_ENV
       if: env.onnxruntime != '' && runner.os == 'Windows' && inputs.skip_onnxruntime != 'true'
       shell: powershell
